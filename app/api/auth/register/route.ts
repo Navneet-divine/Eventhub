@@ -1,14 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/models/User";
 import { connectToDB } from "@/lib/db";
+import User from "@/models/User";
+import cloudinary from "@/lib/cloudinary";
+
 
 export async function POST(req: NextRequest) {
-    const { name, email, password } = await req.json();
     try {
+        const formData = await req.formData();
+
+        const name = formData.get("name") as string;
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+        const avatarFile = formData.get("avatar") as File | null;
+
         await connectToDB();
-        const user = await User.create({ name, email, password });
-        return NextResponse.json(user, { status: 201 });
+
+        let avatarUrl = "";
+
+        if (avatarFile) {
+            const arrayBuffer = await avatarFile.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            const base64String = `data:${avatarFile.type};base64,${buffer.toString("base64")}`;
+
+            const uploadResponse = await cloudinary.uploader.upload(base64String, {
+                folder: "Eventhub",
+            });
+
+            avatarUrl = uploadResponse.secure_url;
+        }
+
+
+
+        const user = await User.create({
+            name,
+            email,
+            password,
+            avatar: avatarUrl,
+        });
+
+        const res = NextResponse.json(user, { status: 201 });
+
+        return res;
     } catch (error) {
+        console.error("Error registering user:", error);
         return NextResponse.json({ message: "Error creating user" }, { status: 500 });
     }
 }

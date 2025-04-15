@@ -1,3 +1,4 @@
+"use client";
 import logo from "@/public/icons/logo.png";
 import Image from "next/image";
 import Navigation from "./Navigation";
@@ -6,8 +7,11 @@ import { NAV_LINK } from "@/constants/index";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
+import { useSession } from "next-auth/react";
+import { MobileNav } from "./MobileNav";
 
 export default function Header() {
+  const { data: session } = useSession();
   return (
     <div className="flex justify-between items-center p-3 px-5 md:px-40">
       <div>
@@ -33,16 +37,42 @@ export default function Header() {
           </ul>
         </Navigation>
       </div>
-      <div>
-        <Link href="/sign-in">
-          <Button
-            className="rounded-full bg-violet-600 hover:bg-violet-600 cursor-pointer"
-            size="lg"
-          >
-            Login
-          </Button>
-        </Link>
+
+      <div className="flex items-center justify-end md:hidden h-full">
+        {session?.user.image ? (
+          <div className="rounded-full h-9 mr-2 shrink-0 w-9">
+            <Image
+              src={session.user.image}
+              alt="userAvatar"
+              width={100}
+              height={100}
+              className="rounded-full"
+            />
+          </div>
+        ) : (
+          <div className="flex justify-center items-center border border-red-500 rounded-full h-9 mr-2 shrink-0 w-9">
+            {session?.user.name[0]}
+          </div>
+        )}
+
+        <div>
+          <MobileNav />
+        </div>
       </div>
+
+      {!session?.user && (
+        <div>
+          <Link href="/sign-in">
+            <Button
+              className="rounded-full bg-violet-600 hover:bg-violet-600 cursor-pointer"
+              size="lg"
+            >
+              Login
+            </Button>
+          </Link>
+        </div>
+      )}
+
       {/* <div className="max-md:hidden">
         <Avatar className="cursor-pointer">
           <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />

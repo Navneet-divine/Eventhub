@@ -4,6 +4,9 @@ import Image from "next/image";
 import googleLogo from "@/public/icons/google.webp";
 import githubLogo from "@/public/icons/github.png";
 
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -36,6 +39,7 @@ const formSchema = z.object({
 });
 
 const SignIn = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,8 +48,18 @@ const SignIn = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
     try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: values.email,
+        password: values.password,
+      });
+
+      if (res?.ok) {
+        router.push("/dashboard");
+      }
     } catch (error) {
       alert("Error signing in. Please try again.");
     }
@@ -62,13 +76,23 @@ const SignIn = () => {
         </div>
 
         <div className="py-5 flex items-center flex-col gap-3">
-          <div className="flex items-center cursor-pointer w-full px-3 border rounded-sm p-2">
+          <div
+            onClick={() =>
+              signIn("google", { redirect: false, callbackUrl: "/dashboard" })
+            }
+            className="flex items-center cursor-pointer w-full px-3 border rounded-sm p-2"
+          >
             <Image src={googleLogo} alt="Google logo" width={20} height={20} />
             <p className="ml-3 font-inter text-gray-600 text-sm">
               Continue with Google
             </p>
           </div>
-          <div className="flex items-center cursor-pointer w-full px-3 border rounded-sm p-2 ">
+          <div
+            onClick={() =>
+              signIn("github", { redirect: true, callbackUrl: "/dashboard" })
+            }
+            className="flex items-center cursor-pointer w-full px-3 border rounded-sm p-2 "
+          >
             <Image src={githubLogo} alt="Github logo" width={20} height={20} />
             <p className="ml-3 font-inter text-gray-600 text-sm">
               Continue with Github
@@ -77,7 +101,7 @@ const SignIn = () => {
         </div>
 
         <div className="flex justify-center items-center gap-2 text-sm text-gray-500 font-inter">
-          <p>or</p>
+          <p> or </p>
         </div>
 
         <div className="pt-3">
@@ -103,7 +127,11 @@ const SignIn = () => {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="john" {...field} name="password" />
+                      <Input
+                        placeholder="**********"
+                        {...field}
+                        name="password"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

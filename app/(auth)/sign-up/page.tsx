@@ -35,7 +35,7 @@ const formSchema = z.object({
   avatar: z.any().optional(),
 });
 
-const SignIn = () => {
+const SignUp = () => {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,13 +48,10 @@ const SignIn = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-
     const formData = new FormData();
     formData.append("name", values.name);
     formData.append("email", values.email);
     formData.append("password", values.password);
-
     if (values.avatar) {
       formData.append("avatar", values.avatar);
     }
@@ -70,7 +67,7 @@ const SignIn = () => {
       }
 
       const data = await response.json();
-      router.push("/dashboard");
+      router.push("/sign-in");
     } catch (error) {
       alert("Something went wrong while registering.");
     }
@@ -166,7 +163,7 @@ const SignIn = () => {
         </div>
         <div>
           <p className="text-sm text-gray-500 font-inter mt-4">
-            Don't have an account?
+            Already have an account?
             <Link href="/sign-in">
               <span className="text-violet-600 cursor-pointer">Sign In</span>
             </Link>
@@ -177,4 +174,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignUp;
