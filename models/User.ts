@@ -8,6 +8,7 @@ interface User {
     avatar?: string;
     createdAt?: Date;
     updatedAt?: Date;
+    color: string
 }
 
 const userSchema = new Schema<User>({
@@ -22,6 +23,9 @@ const userSchema = new Schema<User>({
     },
     avatar: {
         type: String,
+    },
+    color: {
+        type: String, // We'll st
     },
     password: {
         type: String,

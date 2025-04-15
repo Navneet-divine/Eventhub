@@ -11,7 +11,7 @@ const Dashboard: React.FC = () => {
     <div>
       <h1>{session?.user?.name}</h1>
       <div className="w-10 h-10 overflow-hidden rounded-full">
-        {imageSrc ? (
+        {imageSrc && (
           <div className="w-10 h-10 overflow-hidden rounded-full">
             <Image
               src={imageSrc}
@@ -20,10 +20,6 @@ const Dashboard: React.FC = () => {
               width={100}
               height={100}
             />
-          </div>
-        ) : (
-          <div className="w-10 h-10 flex items-center justify-center bg-gray-300 text-white font-bold rounded-full">
-            {session?.user?.name}
           </div>
         )}
       </div>

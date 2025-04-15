@@ -5,7 +5,6 @@ import Navigation from "./Navigation";
 import Link from "next/link";
 import { NAV_LINK } from "@/constants/index";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { useSession } from "next-auth/react";
 import { MobileNav } from "./MobileNav";
@@ -39,7 +38,7 @@ export default function Header() {
       </div>
 
       <div className="flex items-center justify-end md:hidden h-full">
-        {session?.user.image ? (
+        {session?.user.image && (
           <div className="rounded-full h-9 mr-2 shrink-0 w-9">
             <Image
               src={session.user.image}
@@ -49,15 +48,34 @@ export default function Header() {
               className="rounded-full"
             />
           </div>
-        ) : (
-          <div className="flex justify-center items-center border border-red-500 rounded-full h-9 mr-2 shrink-0 w-9">
-            {session?.user.name[0]}
-          </div>
         )}
 
-        <div>
-          <MobileNav />
-        </div>
+        {session &&
+          !session.user.image &&
+          (session?.user.avatar ? (
+            <div className="rounded-full h-9 mr-2 shrink-0 w-9">
+              <Image
+                src={session.user.avatar}
+                alt="userAvatar"
+                width={100}
+                height={100}
+                className="rounded-full h-9 w-9 object-fill"
+              />
+            </div>
+          ) : (
+            <div
+              className="flex justify-center items-center rounded-full h-9 mr-2 shrink-0 w-9 text-white font-montserrat"
+              style={{ backgroundColor: session.user.color }}
+            >
+              {session.user.name?.charAt(0).toUpperCase()}
+            </div>
+          ))}
+
+        {session && (
+          <div>
+            <MobileNav />
+          </div>
+        )}
       </div>
 
       {!session?.user && (
@@ -72,13 +90,6 @@ export default function Header() {
           </Link>
         </div>
       )}
-
-      {/* <div className="max-md:hidden">
-        <Avatar className="cursor-pointer">
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback className="bg-gray-600 text-white">CN</AvatarFallback>
-        </Avatar>
-      </div> */}
     </div>
   );
 }

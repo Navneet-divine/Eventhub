@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
-const PUBLIC_PATHS = ['/', '/sign-in']
+const PUBLIC_PATHS = ['/', '/sign-in', "/sign-up"]
 
 export async function middleware(request: NextRequest) {
     const token = await getToken({ req: request })
@@ -20,10 +20,9 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/sign-in', request.url))
     }
 
-    // ✅ Allow access to requested page
     return NextResponse.next()
 }
 
 export const config = {
-    matcher: ['/', '/sign-in', '/dashboard'],
+    matcher: ['/((?!_next|api|favicon.ico).*)'],
 }

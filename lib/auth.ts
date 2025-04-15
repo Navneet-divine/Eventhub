@@ -35,6 +35,7 @@ export const authOptions: NextAuthOptions = {
                     };
                     await connectToDB();
                     const user = await User.findOne({ email });
+                    console.log(user)
                     if (!user) {
                         throw new Error("User not found");
                     }
@@ -47,6 +48,8 @@ export const authOptions: NextAuthOptions = {
                         id: user._id.toString(),
                         name: user.name,
                         email: user.email,
+                        avatar: user.avatar,
+                        color: user.color
                     }
                 } catch (error) {
                     console.log(error)
@@ -62,7 +65,8 @@ export const authOptions: NextAuthOptions = {
                 token.id = user.id;
                 token.name = user.name;
                 token.email = user.email;
-
+                token.avatar = (user as any).avatar;
+                token.color = (user as any).color;
             }
             return token;
         },
@@ -71,6 +75,8 @@ export const authOptions: NextAuthOptions = {
                 session.user.id = token.id
                 session.user.name = token.name;
                 session.user.email = token.email;
+                session.user.avatar = token.avatar
+                session.user.color = token.color;
             }
             return session;
         }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDB } from "@/lib/db";
 import User from "@/models/User";
 import cloudinary from "@/lib/cloudinary";
+import { generateColor } from "@/utils/generateColor";
 
 
 export async function POST(req: NextRequest) {
@@ -32,9 +33,12 @@ export async function POST(req: NextRequest) {
 
 
 
+        const color = generateColor(name)
+
         const user = await User.create({
             name,
             email,
+            color,
             password,
             avatar: avatarUrl,
         });
