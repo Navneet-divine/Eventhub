@@ -1,11 +1,11 @@
 export const NAV_LINK = [
     {
         label: "Home",
-        route: "/",
+        route: "/home",
     },
     {
         label: "Create Event",
-        route: "/create-event",
+        route: "/events/create-event",
     },
     {
         label: "Profile",

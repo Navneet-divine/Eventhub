@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Eye } from "lucide-react";
+import { EyeOff } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -36,6 +39,8 @@ const formSchema = z.object({
 });
 
 const SignUp = () => {
+  const [isClick, setIsClick] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,6 +53,7 @@ const SignUp = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsClick(true);
     const formData = new FormData();
     formData.append("name", values.name);
     formData.append("email", values.email);
@@ -123,11 +129,29 @@ const SignUp = () => {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="**********"
-                        {...field}
-                        name="password"
-                      />
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="password"
+                          {...field}
+                          name="password"
+                          className="pr-10"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="absolute cursor-pointer right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 "
+                          tabIndex={-1}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="text-gray-400" />
+                          ) : (
+                            <Eye className="text-gray-400" />
+                          )}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -154,6 +178,7 @@ const SignUp = () => {
               />
               <Button
                 type="submit"
+                disabled={isClick}
                 className="w-full bg-violet-600 hover:bg-violet-600 cursor-pointer"
               >
                 Continue

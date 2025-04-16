@@ -10,12 +10,12 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,6 +23,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { Eye } from "lucide-react";
+import { EyeOff } from "lucide-react";
+import { useState } from "react";
 
 const formSchema = z.object({
   email: z
@@ -39,6 +42,8 @@ const formSchema = z.object({
 });
 
 const SignIn = () => {
+  const [isClick, setIsClick] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,7 +54,7 @@ const SignIn = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    setIsClick(true);
     try {
       const res = await signIn("credentials", {
         redirect: false,
@@ -58,7 +63,10 @@ const SignIn = () => {
       });
 
       if (res?.ok) {
-        router.push("/dashboard");
+        router.push("/home");
+        toast.success("Successfully signed in!");
+      } else {
+        toast.error("Invalid credentials.");
       }
     } catch (error) {
       alert("Error signing in. Please try again.");
@@ -78,7 +86,7 @@ const SignIn = () => {
         <div className="py-5 flex items-center flex-col gap-3">
           <div
             onClick={() =>
-              signIn("google", { redirect: false, callbackUrl: "/dashboard" })
+              signIn("google", { redirect: false, callbackUrl: "/home" })
             }
             className="flex items-center cursor-pointer w-full px-3 border rounded-sm p-2"
           >
@@ -89,7 +97,7 @@ const SignIn = () => {
           </div>
           <div
             onClick={() =>
-              signIn("github", { redirect: true, callbackUrl: "/dashboard" })
+              signIn("github", { redirect: true, callbackUrl: "/home" })
             }
             className="flex items-center cursor-pointer w-full px-3 border rounded-sm p-2 "
           >
@@ -127,11 +135,29 @@ const SignIn = () => {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="**********"
-                        {...field}
-                        name="password"
-                      />
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="password"
+                          {...field}
+                          name="password"
+                          className="pr-10"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="absolute cursor-pointer right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 "
+                          tabIndex={-1}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="text-gray-400" />
+                          ) : (
+                            <Eye className="text-gray-400" />
+                          )}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -139,6 +165,7 @@ const SignIn = () => {
               />
               <Button
                 type="submit"
+                disabled={isClick}
                 className="w-full bg-violet-600 hover:bg-violet-600 cursor-pointer"
               >
                 Continue

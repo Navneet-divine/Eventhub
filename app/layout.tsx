@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Eventhub | Landing Page",
@@ -25,6 +26,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <Toaster />
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
