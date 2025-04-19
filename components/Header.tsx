@@ -10,15 +10,7 @@ import { useSession } from "next-auth/react";
 import { MobileNav } from "./MobileNav";
 
 export default function Header() {
-  const { data: session, status } = useSession();
-
-  // if (status === "loading") {
-  //   return (
-  //     <div>
-  //       <p className="p-4 text-gray-500"></p>;
-  //     </div>
-  //   );
-  // }
+  const { data: session } = useSession();
 
   return (
     <div className="flex justify-between items-center p-3 px-5 lg:px-28 xl:px-40">
@@ -49,9 +41,9 @@ export default function Header() {
         </div>
       )}
 
-      <div className="flex items-center justify-end  h-full">
+      <div className="flex items-center justify-end h-full">
         {session?.user.image && (
-          <div className="rounded-full h-9 mr-2 shrink-0 w-9">
+          <div className="rounded-full h-9 mr-2 shrink-0 w-9 cursor-pointer">
             <Image
               src={session.user.image}
               alt="userAvatar"
@@ -65,7 +57,7 @@ export default function Header() {
         {session &&
           !session.user.image &&
           (session?.user.avatar ? (
-            <div className="rounded-full h-9 mr-2 shrink-0 w-9">
+            <div className="rounded-full h-9 mr-2 shrink-0 w-9 cursor-pointer">
               <Image
                 src={session.user.avatar}
                 alt="userAvatar"
@@ -76,7 +68,7 @@ export default function Header() {
             </div>
           ) : (
             <div
-              className="flex justify-center items-center rounded-full h-9 mr-2 shrink-0 w-9 text-white font-montserrat"
+              className="flex justify-center items-center rounded-full h-9 mr-2 shrink-0 w-9 text-white font-montserrat cursor-pointer"
               style={{ backgroundColor: session.user.color }}
             >
               {session.user.name?.charAt(0).toUpperCase()}
