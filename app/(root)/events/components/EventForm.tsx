@@ -1,8 +1,15 @@
 "use client";
 
+import type React from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
+import { useState, useRef } from "react";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,40 +21,48 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import { evnetFormSchema } from "@/lib/validator";
 import { eventDefaultValues } from "@/constants";
 import Dropdown from "./Dropdown";
 import { CloudUpload } from "lucide-react";
 
-import { useRef, useState } from "react";
-import Image from "next/image";
 import locationIcon from "@/public/icons/location-grey.svg";
 import calenderIcon from "@/public/icons/calendar.svg";
 import urlIcon from "@/public/icons/link.svg";
 import priceIcon from "@/public/icons/dollar.svg";
 
-import { Checkbox } from "@/components/ui/checkbox";
-
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { createEvent } from "@/lib/actions/event.actions";
+import { useRouter } from "next/navigation";
 
 type FormData = z.infer<typeof evnetFormSchema>;
 
 const EventForm: React.FC = () => {
+  const router = useRouter();
+  const { data: session } = useSession();
   const fileUpload = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-
-  const initialValues = eventDefaultValues;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(evnetFormSchema),
-    defaultValues: initialValues,
+    defaultValues: eventDefaultValues,
   });
 
   const handleUploadFile = () => {
     fileUpload.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      form.setValue("imageUrl", "image-will-be-uploaded" as any);
+    }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -55,8 +70,9 @@ const EventForm: React.FC = () => {
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file) {
+      setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
-      form.setValue("imageUrl", file as any);
+      form.setValue("imageUrl", "image-will-be-uploaded" as any);
     }
   };
 
@@ -69,8 +85,46 @@ const EventForm: React.FC = () => {
     setIsDragging(false);
   };
 
-  const onSubmit = (values: FormData) => {
-    console.log("Submitted values:", values);
+  const onSubmit = async (values: FormData) => {
+    try {
+      setIsSubmitting(true);
+
+      const formData = new FormData();
+
+      Object.entries(values).forEach(([key, value]) => {
+        if (key !== "imageUrl" && value !== undefined && value !== null) {
+          if (value instanceof Date) {
+            formData.append(key, value.toISOString());
+          } else {
+            formData.append(key, String(value));
+          }
+        }
+      });
+
+      if (imageFile) {
+        formData.append("imageUrl", imageFile);
+      }
+
+      for (const pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      const result = await createEvent(formData, session?.user);
+      console.log(result);
+
+      if (result.success === false) {
+        console.error("Error creating event:", result.error);
+      } else {
+        form.reset();
+        setImagePreview(null);
+        setImageFile(null);
+      }
+      router.push(`/events/event-detail/${result._id}`);
+    } catch (error) {
+      console.error("Failed to create event:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -78,7 +132,6 @@ const EventForm: React.FC = () => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Title */}
             <FormField
               control={form.control}
               name="title"
@@ -99,7 +152,7 @@ const EventForm: React.FC = () => {
             {/* Category */}
             <FormField
               control={form.control}
-              name="categoryId"
+              name="category"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -124,7 +177,7 @@ const EventForm: React.FC = () => {
                       <Textarea
                         placeholder="Description"
                         {...field}
-                        className="h-64 "
+                        className="h-64"
                       />
                     </FormControl>
                     <FormMessage />
@@ -171,7 +224,7 @@ const EventForm: React.FC = () => {
 
                       {imagePreview && (
                         <img
-                          src={imagePreview}
+                          src={imagePreview || "/placeholder.svg"}
                           alt="Preview"
                           className="w-full h-full object-cover rounded-md"
                         />
@@ -183,13 +236,7 @@ const EventForm: React.FC = () => {
                           accept="image/*"
                           className="hidden"
                           ref={fileUpload}
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              setImagePreview(URL.createObjectURL(file));
-                              field.onChange(e);
-                            }
-                          }}
+                          onChange={handleFileChange}
                         />
                       </FormControl>
                       <FormMessage />
@@ -208,17 +255,14 @@ const EventForm: React.FC = () => {
                 <FormItem>
                   <FormControl>
                     <div className="relative w-full">
-                      {/* Icon positioned inside input */}
                       <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                         <Image
-                          src={locationIcon}
+                          src={locationIcon || "/placeholder.svg"}
                           alt="Location"
                           width={20}
                           height={20}
                         />
                       </div>
-
-                      {/* Input with left padding to make space for icon */}
                       <Input
                         placeholder="Event location or online"
                         {...field}
@@ -242,10 +286,9 @@ const EventForm: React.FC = () => {
                   <FormItem className="w-full">
                     <FormControl>
                       <div className="relative flex-grow">
-                        {/* Icon inside input */}
                         <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                           <Image
-                            src={priceIcon}
+                            src={priceIcon || "/placeholder.svg"}
                             alt="Price"
                             width={20}
                             height={20}
@@ -287,7 +330,7 @@ const EventForm: React.FC = () => {
               />
             </div>
 
-            {/* Price */}
+            {/* URL */}
             <FormField
               control={form.control}
               name="url"
@@ -295,17 +338,14 @@ const EventForm: React.FC = () => {
                 <FormItem>
                   <FormControl>
                     <div className="relative w-full">
-                      {/* Icon positioned inside input */}
                       <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                         <Image
-                          src={urlIcon}
-                          alt="Location"
+                          src={urlIcon || "/placeholder.svg"}
+                          alt="URL"
                           width={20}
                           height={20}
                         />
                       </div>
-
-                      {/* Input with left padding to make space for icon */}
                       <Input
                         placeholder="URL"
                         onChange={field.onChange}
@@ -319,6 +359,7 @@ const EventForm: React.FC = () => {
               )}
             />
 
+            {/* Start Date */}
             <FormField
               control={form.control}
               name="startDateTime"
@@ -327,16 +368,14 @@ const EventForm: React.FC = () => {
                   <p>Start Date:</p>
                   <FormControl>
                     <div className="relative w-full flex items-center">
-                      {/* Icon positioned beside the input */}
                       <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <Image
-                          src={calenderIcon}
-                          alt="Location"
+                          src={calenderIcon || "/placeholder.svg"}
+                          alt="Calendar"
                           width={20}
                           height={20}
                         />
                       </div>
-
                       <DatePicker
                         selected={field.value}
                         onChange={field.onChange}
@@ -353,7 +392,7 @@ const EventForm: React.FC = () => {
               )}
             />
 
-            {/* end date */}
+            {/* End Date */}
             <FormField
               control={form.control}
               name="endDateTime"
@@ -362,23 +401,21 @@ const EventForm: React.FC = () => {
                   <p>End Date:</p>
                   <FormControl>
                     <div className="relative w-full flex items-center">
-                      {/* Icon positioned beside the input */}
                       <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <Image
-                          src={calenderIcon}
-                          alt="Location"
+                          src={calenderIcon || "/placeholder.svg"}
+                          alt="Calendar"
                           width={20}
                           height={20}
                         />
                       </div>
-
                       <DatePicker
                         selected={field.value}
                         onChange={field.onChange}
                         showTimeSelect
                         timeInputLabel="Time:"
                         dateFormat="MM/dd/yy h:mm aa"
-                        placeholderText="Start Date:"
+                        placeholderText="End Date:"
                         className="pl-12 py-2 text-sm px-4 w-full border-none focus:outline-none rounded-md cursor-pointer"
                       />
                     </div>
@@ -387,17 +424,15 @@ const EventForm: React.FC = () => {
                 </FormItem>
               )}
             />
-
-            {/* Title */}
           </div>
 
-          {/*  */}
           <div>
             <Button
               type="submit"
               className="w-full bg-violet-600 hover:bg-violet-500 rounded-3xl"
+              disabled={isSubmitting}
             >
-              Submit
+              {isSubmitting ? "Creating Event..." : "Submit"}
             </Button>
           </div>
         </form>

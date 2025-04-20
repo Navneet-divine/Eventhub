@@ -31,8 +31,6 @@ export async function POST(req: NextRequest) {
             avatarUrl = uploadResponse.secure_url;
         }
 
-
-
         const color = generateColor(name)
 
         const user = await User.create({
