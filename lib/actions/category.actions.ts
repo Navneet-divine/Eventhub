@@ -24,7 +24,6 @@ export const createCategory = async (categoryName: string) => {
             name: categoryName,
         });
 
-        console.log(newCategory.name);
 
         revalidatePath("/events/create-event");
 

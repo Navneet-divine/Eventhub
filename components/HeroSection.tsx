@@ -6,7 +6,7 @@ import Link from "next/link";
 const HeroSection: React.FC = () => {
   return (
     <>
-      <section className="flex flex-col sm:flex-row bg-violet-50 px-5 lg:px-28 xl:px-40  pt-5 pb-10">
+      <section className="flex flex-col sm:flex-row bg-violet-50 px-5 lg:px-28 xl:px-40 pt-5 pb-10">
         <div className="sm:w-1/2 pt-7">
           <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold font-montserrat">
             Host,connect, Celebrate: Your Events,

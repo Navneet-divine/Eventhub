@@ -1,32 +1,21 @@
-"use client";
-
-import { useSession, signOut } from "next-auth/react";
-import { toast } from "sonner";
 import HeroSection from "@/components/HeroSection";
+import Collection from "@/components/Collection";
+import { getAllEvent } from "@/lib/actions/event.actions";
+import { signOut } from "next-auth/react";
+import Logout from "@/components/LogOut";
 
-const Dashboard: React.FC = () => {
-  const { data: session, status } = useSession();
+const Dashboard: React.FC = async () => {
+  const allEvents = await getAllEvent();
+  console.log(allEvents.data);
+  console.log(allEvents.data.length);
 
-  if (status === "loading") {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <p className="p-4 text-gray-500">Loading...</p>
-      </div>
-    );
-  }
-
-  const imageSrc = session?.user?.image;
   return (
     <div>
       <HeroSection />
-      <button
-        onClick={() => {
-          toast.success("Logging out...");
-          signOut({ redirect: true, callbackUrl: "/" });
-        }}
-      >
-        Logout
-      </button>
+
+      <Collection allEvents={allEvents.data} />
+
+      <Logout />
     </div>
   );
 };

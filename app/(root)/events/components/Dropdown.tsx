@@ -34,9 +34,14 @@ type Category = {
 type DropdownProps = {
   value?: string;
   onChangeHandler?: (value: string) => void;
+  category?: string;
 };
 
-const Dropdown: React.FC<DropdownProps> = ({ onChangeHandler, value }) => {
+const Dropdown: React.FC<DropdownProps> = ({
+  onChangeHandler,
+  value,
+  category,
+}) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState("");
   const [error, setError] = useState("");
@@ -61,17 +66,21 @@ const Dropdown: React.FC<DropdownProps> = ({ onChangeHandler, value }) => {
   useEffect(() => {
     async function getAllCategories() {
       const allCategories = await getCategories();
-      console.log(allCategories);
       setCategories(allCategories);
     }
     getAllCategories();
   }, []);
 
   return (
-    <div>
+    <div className="space-y-2">
       <Select onValueChange={onChangeHandler} defaultValue={value}>
         <SelectTrigger className="w-full border-none">
-          <SelectValue placeholder="Category" />
+          {category ? (
+            <SelectValue placeholder={category} />
+          ) : (
+            <SelectValue placeholder="Category" />
+          )}
+          {/* Placeholder is now inside SelectValue */}
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
@@ -81,45 +90,46 @@ const Dropdown: React.FC<DropdownProps> = ({ onChangeHandler, value }) => {
                 {category.name}
               </SelectItem>
             ))}
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="text-violet-600 border-none w-fit cursor-pointer hover:text-violet-600 px-2"
-                >
-                  Add new category
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>New Category</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    <Input
-                      type="text"
-                      placeholder="Category name"
-                      value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value)}
-                    />
-                    {error && (
-                      <span className="text-red-500 text-sm mt-2">{error}</span>
-                    )}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-violet-600 hover:bg-violet-600"
-                    onClick={handleAddNewCategory}
-                  >
-                    ADD
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
           </SelectGroup>
         </SelectContent>
       </Select>
+
+      {/* AlertDialog is now outside the SelectContent */}
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="text-violet-600 border-none w-fit cursor-pointer hover:text-violet-600 px-2"
+          >
+            Add new category
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>New Category</AlertDialogTitle>
+            <AlertDialogDescription>
+              <Input
+                type="text"
+                placeholder="Category name"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+              {error && (
+                <span className="text-red-500 text-sm mt-2 block">{error}</span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-violet-600 hover:bg-violet-600"
+              onClick={handleAddNewCategory}
+            >
+              ADD
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

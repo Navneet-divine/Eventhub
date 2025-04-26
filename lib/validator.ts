@@ -10,5 +10,6 @@ export const evnetFormSchema = z.object({
   category: z.string(),
   price: z.string(),
   isFree: z.boolean(),
-  url: z.string().url()
+  url: z.string().url(),
+  organizer: z.string().optional(),
 });

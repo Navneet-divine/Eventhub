@@ -5,6 +5,7 @@ import { connectToDB } from "../db"
 import User from "@/models/User"
 import { generateColor } from "@/utils/generateColor"
 import cloudinary from "../cloudinary"
+import { revalidatePath } from "next/cache"
 
 export async function createEvent(formData: FormData, userdata: any) {
     try {
@@ -90,7 +91,7 @@ export async function getEventById(eventId: string) {
             throw new Error("did not get eventId")
         }
 
-        const event = await Event.findById(eventId)
+        const event = await Event.findById(eventId).populate("organizer")
 
         if (!event) {
             throw new Error("Event does not exist")
@@ -106,3 +107,119 @@ export async function getEventById(eventId: string) {
         return { success: false, error: "Something went wrong" }
     }
 }
+
+export async function getAllEvent(limit = 8) {
+    try {
+        await connectToDB()
+        const events = await Event.find().populate("organizer").sort({ createdAt: "desc" }).skip(0).limit(6)
+        const eventCount = await Event.countDocuments()
+
+        console.log(events)
+
+        if (!events) {
+            throw new Error("Error fetching events")
+        }
+
+        return {
+            data: JSON.parse(JSON.stringify(events)),
+            totalPages: Math.ceil(eventCount / limit),
+            success: true,
+        }
+
+    } catch (error) {
+        console.error("Error in getAllEvent:", error)
+        if (error instanceof Error) {
+            return { success: false, error: error.message || "Something went wrong" }
+        }
+        return { success: false, error: "Something went wrong" }
+    }
+}
+
+export async function editEvent(eventId: string, formData: FormData) {
+    try {
+        await connectToDB()
+
+        console.log("Received FormData in server action for editing event:")
+        for (const [key, value] of formData.entries()) {
+            console.log(`${key}: ${typeof value === "object" ? "File object" : value}`)
+        }
+
+        // Find the event to be edited
+        const event = await Event.findById(eventId)
+        if (!event) {
+            throw new Error("Event does not exist")
+        }
+
+        const eventData: Record<string, any> = {}
+
+        // Process FormData
+        for (const [key, value] of formData.entries()) {
+            if (key !== "imageUrl") {
+                eventData[key] = value
+            }
+        }
+
+        let imageUrl = event.imageUrl // Default to current imageUrl if no new image is uploaded
+
+        const imageFile = formData.get("imageUrl")
+        if (imageFile && imageFile instanceof File) {
+            try {
+                const arrayBuffer = await imageFile.arrayBuffer()
+                const buffer = Buffer.from(arrayBuffer)
+
+                const base64String = `data:${imageFile.type};base64,${buffer.toString("base64")}`
+
+                const uploadResponse = await cloudinary.uploader.upload(base64String, {
+                    folder: "Eventhub",
+                })
+
+                imageUrl = uploadResponse.secure_url
+            } catch (uploadError) {
+                console.error("Error uploading image to Cloudinary:", uploadError)
+                throw new Error("Failed to upload image")
+            }
+        }
+
+        // Update event with new data
+        const updatedEvent = await Event.findByIdAndUpdate(
+            eventId,
+            {
+                ...eventData,
+                imageUrl: imageUrl,
+            },
+            { new: true }
+        )
+
+        return JSON.parse(JSON.stringify(updatedEvent))
+
+    } catch (error) {
+        console.error("Error in editEvent:", error)
+        if (error instanceof Error) {
+            return { success: false, error: error.message || "Something went wrong" }
+        }
+        return { success: false, error: "Something went wrong" }
+    }
+}
+
+export async function deleteEvent(eventId: string) {
+    try {
+        await connectToDB()
+        const event = await Event.findByIdAndDelete(eventId)
+
+        if (!event) {
+            throw new Error("Event does not exist")
+        }
+
+        revalidatePath("/home")
+        return JSON.parse(JSON.stringify(event))
+
+    } catch (error) {
+        console.error("Error in deleteEvent:", error)
+        if (error instanceof Error) {
+            return { success: false, error: error.message || "Something went wrong" }
+        }
+        return { success: false, error: "Something went wrong" }
+    }
+}
+
+
