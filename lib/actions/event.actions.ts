@@ -114,8 +114,6 @@ export async function getAllEvent(limit = 8) {
         const events = await Event.find().populate("organizer").sort({ createdAt: "desc" }).skip(0).limit(6)
         const eventCount = await Event.countDocuments()
 
-        console.log(events)
-
         if (!events) {
             throw new Error("Error fetching events")
         }
@@ -215,6 +213,38 @@ export async function deleteEvent(eventId: string) {
 
     } catch (error) {
         console.error("Error in deleteEvent:", error)
+        if (error instanceof Error) {
+            return { success: false, error: error.message || "Something went wrong" }
+        }
+        return { success: false, error: "Something went wrong" }
+    }
+}
+
+export async function getRelatedEvent(eventId: string) {
+    try {
+        await connectToDB()
+        const event = await Event.findById(eventId)
+        if (!event) {
+            throw new Error("Event does not exist")
+        }
+        let relatedEvent: any[] = []
+
+        if (event.isFree) {
+            relatedEvent = await Event.find({ isFree: true })
+        } else if (event.price > 0) {
+            relatedEvent = await Event.find({ isFree: false })
+        } else if (event.price === "") {
+            relatedEvent = []
+        } else if (event.price > 0 && event.isFree === true) {
+            relatedEvent = await Event.find({ isFree: false })
+        }
+
+        console.log("Related events:", relatedEvent)
+
+        return JSON.parse(JSON.stringify(relatedEvent))
+
+    } catch (error) {
+        console.error("Error in getRelatedEvent:", error)
         if (error instanceof Error) {
             return { success: false, error: error.message || "Something went wrong" }
         }

@@ -1,6 +1,10 @@
 "use client";
 
-import { getAllEvent, getEventById } from "@/lib/actions/event.actions";
+import {
+  getAllEvent,
+  getEventById,
+  getRelatedEvent,
+} from "@/lib/actions/event.actions";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -15,7 +19,7 @@ import RelatedEvents from "../../components/RelatedEvents";
 const EventDetails = () => {
   const params = useParams();
   const eventId = params?.eventId as string;
-  const [allEvents, setAllEvents] = useState<any>([]);
+  const [relatedEvents, setRelatedEvents] = useState<any>([]);
 
   const [event, setEvent] = useState<any>(null);
   console.log(event);
@@ -33,11 +37,13 @@ const EventDetails = () => {
 
   useEffect(() => {
     const fetchAllEvents = async () => {
-      const res = await getAllEvent();
-      setAllEvents(res.data);
+      const res = await getRelatedEvent(eventId);
+      setRelatedEvents(res);
     };
     fetchAllEvents();
-  }, []);
+  }, [eventId]);
+
+  console.log(relatedEvents);
 
   return (
     <>
@@ -149,7 +155,7 @@ const EventDetails = () => {
           <p>Loading...</p>
         )}
         <div>
-          <RelatedEvents allEvents={allEvents} />
+          <RelatedEvents allEvents={relatedEvents} />
         </div>
       </section>
     </>
