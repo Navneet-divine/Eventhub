@@ -92,6 +92,7 @@ export async function getEventById(eventId: string) {
         }
 
         const event = await Event.findById(eventId).populate("organizer")
+        console.log("Event found:", event)
 
         if (!event) {
             throw new Error("Event does not exist")
@@ -222,34 +223,41 @@ export async function deleteEvent(eventId: string) {
 
 export async function getRelatedEvent(eventId: string) {
     try {
-        await connectToDB()
-        const event = await Event.findById(eventId)
+        await connectToDB();
+        const event = await Event.findById(eventId);
         if (!event) {
-            throw new Error("Event does not exist")
+            throw new Error("Event does not exist");
         }
-        let relatedEvent: any[] = []
+        let relatedEvent: any[] = [];
 
+        // Ensure the event being fetched is not included in the related events
         if (event.isFree) {
-            relatedEvent = await Event.find({ isFree: true })
-        } else if (event.price > 0) {
-            relatedEvent = await Event.find({ isFree: false })
+            relatedEvent = await Event.find({ isFree: true, _id: { $ne: eventId } });
+        } else if (Number(event.price) > 0) {
+            relatedEvent = await Event.find({ isFree: false, _id: { $ne: eventId } });
         } else if (event.price === "") {
-            relatedEvent = []
-        } else if (event.price > 0 && event.isFree === true) {
-            relatedEvent = await Event.find({ isFree: false })
+            relatedEvent = [];
+        } else if (Number(event.price) > 0 && event.isFree === true) {
+            relatedEvent = await Event.find({ isFree: true, _id: { $ne: eventId } });
+        } else if (Number(event.price) > 0) {
+            relatedEvent = await Event.find({ isFree: false, _id: { $ne: eventId } });
+        } else if (event.price === "") {
+            relatedEvent = [];
+        } else if (event.price === "" && event.isFree === false) {
+            relatedEvent = await Event.find({ isFree: true, _id: { $ne: eventId } });
         }
 
-        console.log("Related events:", relatedEvent)
+        console.log("Related events:", relatedEvent);
 
-        return JSON.parse(JSON.stringify(relatedEvent))
-
+        return JSON.parse(JSON.stringify(relatedEvent));
     } catch (error) {
-        console.error("Error in getRelatedEvent:", error)
+        console.error("Error in getRelatedEvent:", error);
         if (error instanceof Error) {
-            return { success: false, error: error.message || "Something went wrong" }
+            return { success: false, error: error.message || "Something went wrong" };
         }
-        return { success: false, error: "Something went wrong" }
+        return { success: false, error: "Something went wrong" };
     }
 }
+
 
 

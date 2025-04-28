@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  getAllEvent,
-  getEventById,
-  getRelatedEvent,
-} from "@/lib/actions/event.actions";
+import { getEventById, getRelatedEvent } from "@/lib/actions/event.actions";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -15,15 +11,31 @@ import calenderIcon from "@/public/icons/calendar.svg";
 import locationIcon from "@/public/icons/location.svg";
 import { formatDateTime } from "@/utils/formatDate";
 import RelatedEvents from "../../components/RelatedEvents";
+import { loadStripe, Stripe } from "@stripe/stripe-js";
+
+interface Event {
+  _id: string;
+  title: string;
+  price: number | string;
+  category: string;
+  organizer: {
+    name: string;
+  };
+  startDateTime: string;
+  endDateTime: string;
+  location: string;
+  imageUrl: string;
+  url: string;
+}
 
 const EventDetails = () => {
   const params = useParams();
   const eventId = params?.eventId as string;
   const [relatedEvents, setRelatedEvents] = useState<any>([]);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [isRelatedEventsLoading, setIsRelatedEventsLoading] = useState(true);
 
-  const [event, setEvent] = useState<any>(null);
-  console.log(event);
-
+  // Fetch the event details when eventId changes
   useEffect(() => {
     if (!eventId) return;
 
@@ -35,130 +47,184 @@ const EventDetails = () => {
     fetchEvent();
   }, [eventId]);
 
+  // Fetch related events
   useEffect(() => {
+    if (!eventId) return;
+
     const fetchAllEvents = async () => {
-      const res = await getRelatedEvent(eventId);
-      setRelatedEvents(res);
+      try {
+        const res = await getRelatedEvent(eventId);
+        setRelatedEvents(res);
+      } catch (error) {
+        console.error("Failed to fetch related events:", error);
+      } finally {
+        setIsRelatedEventsLoading(false);
+      }
     };
+
     fetchAllEvents();
   }, [eventId]);
 
-  console.log(relatedEvents);
+  // Handle Stripe checkout
+  const handleCheckout = async () => {
+    const stripe: Stripe | null = await loadStripe(
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+    );
+
+    if (!stripe) {
+      console.error("Stripe failed to load.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          eventId: event!._id,
+          eventTitle: event!.title,
+          eventPrice: event!.price,
+          eventCategory: event!.category,
+          eventOrganizer: event!.organizer.name,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        console.error("Error during checkout session creation:", data.error);
+        return;
+      }
+
+      const { sessionId } = data;
+      await stripe.redirectToCheckout({
+        sessionId: sessionId,
+      });
+    } catch (error) {
+      console.error("Checkout error:", error);
+    }
+  };
+
+  console.log("Event:", event);
 
   return (
-    <>
-      <section className="md:px-5 lg:px-28 xl:px-40 pt-5 pb-10 h-full">
-        {/* <h1 className="text-2xl font-bold">Event Details</h1> */}
-        {event ? (
-          <div className="md:flex gap-15 md:gap-5 lg:gap-15">
-            {/* first div */}
-            <div>
-              <Image
-                className="h-[90%] object-cover max-md:hidden"
-                src={event.imageUrl}
-                alt="event img"
-                width={900}
-                height={800}
-              />
-              <Image
-                className="w-full max-md:h-[300px] md:hidden object-cover"
-                src={event.imageUrl}
-                alt="event img"
-                width={300}
-                height={400}
-              />
-            </div>
-            {/* second div */}
-            <div className="w-full md:mt-5 p-4 md:p-0">
-              <div className="flex flex-col gap-5">
-                <div>
-                  <p className="text-4xl font-inter font-semibold">
-                    {event.title}
+    <section className="md:px-5 lg:px-28 xl:px-40 pt-5 pb-10 h-full">
+      {event ? (
+        <div className="md:flex gap-15 md:gap-5 lg:gap-15">
+          {/* Event Image Section */}
+          <div>
+            <Image
+              className="h-[90%] object-cover max-md:hidden"
+              src={event.imageUrl}
+              alt="event img"
+              width={900}
+              height={800}
+            />
+            <Image
+              className="w-full max-md:h-[300px] md:hidden object-cover"
+              src={event.imageUrl}
+              alt="event img"
+              width={300}
+              height={400}
+            />
+          </div>
+          {/* Event Info Section */}
+          <div className="w-full md:mt-5 p-4 md:p-0">
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="text-4xl font-inter font-semibold">
+                  {event.title}
+                </p>
+              </div>
+              <div className="flex gap-x-5">
+                {Number(event.price) > 0 ? (
+                  <p className="text-green-600 font-semibold font-inter">
+                    ${event.price}
+                  </p>
+                ) : (
+                  <p className="text-green-600 font-semibold font-inter">
+                    Free
+                  </p>
+                )}
+
+                <div className="flex items-center justify-center bg-gray-300 px-2 rounded-full">
+                  <p className="text-gray-600 font-semibold font-inter text-sm">
+                    {event.category}
                   </p>
                 </div>
-                <div className="flex gap-x-5">
-                  {event.price > 0 ? (
-                    <p className="text-green-600 font-semibold font-inter">
-                      ${event.price}
-                    </p>
-                  ) : (
-                    <p className="text-green-600 font-semibold font-inter">
-                      Free
-                    </p>
-                  )}
-
-                  <div className="flex items-center justify-center bg-gray-300 px-2 rounded-full">
-                    <p className="text-gray-600 font-semibold font-inter text-sm">
-                      {event.category}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-montserrat text-sm font-semibold">
-                      by{" "}
-                      <span className="text-violet-600 font-inter">
-                        {event.organizer.name}
-                      </span>
-                    </p>
-                  </div>
-                </div>
                 <div>
-                  <Button className="w-30 rounded-full h-10 bg-violet-600 font-inter hover:bg-violet-600 cursor-pointer">
+                  <p className="font-montserrat text-sm font-semibold">
+                    by{" "}
+                    <span className="text-violet-600 font-inter">
+                      {event.organizer.name}
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                {event.price !== "" && (
+                  <Button
+                    onClick={handleCheckout}
+                    className="w-30 rounded-full h-10 bg-violet-600 font-inter hover:bg-violet-600 cursor-pointer"
+                  >
                     Get Ticket
                   </Button>
-                </div>
-                <div className="">
-                  <div className="flex gap-2 items-center">
-                    <div>
-                      <Image src={locationIcon} alt="" width={30} height={30} />
-                    </div>
-                    <div>
-                      <p>
-                        {formatDateTime(event.startDateTime)} /{" "}
-                        {formatDateTime(event.endDateTime)}
-                      </p>
-                    </div>
+                )}
+              </div>
+              {/* Event Date and Location */}
+              <div>
+                <div className="flex gap-2 items-center">
+                  <div>
+                    <Image src={locationIcon} alt="" width={30} height={30} />
                   </div>
-                  <div className="flex gap-2 mt-3 items-center">
-                    <div>
-                      <Image
-                        src={calenderIcon}
-                        alt=""
-                        width={30}
-                        height={100}
-                      />
-                    </div>
-                    <div>
-                      <p>{event.location}</p>
-                    </div>
+                  <div>
+                    <p>
+                      {formatDateTime(event.startDateTime)} /{" "}
+                      {formatDateTime(event.endDateTime)}
+                    </p>
                   </div>
                 </div>
-                <div>
-                  <h1 className="font-inter font-bold text-gray-500">
-                    What You'll Learn:
-                  </h1>
-                  <p className="font-montserrat">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                    Rem, nulla. Deleniti architecto consequatur ullam mollitia
-                    perspiciatis, quaerat corrupti, sit enim obcaecati quisquam
-                    eum animi, magni reiciendis odio. Ex, consectetur pariatur!
-                  </p>
+                <div className="flex gap-2 mt-3 items-center">
+                  <div>
+                    <Image src={calenderIcon} alt="" width={30} height={100} />
+                  </div>
+                  <div>
+                    <p>{event.location}</p>
+                  </div>
                 </div>
-                <div>
-                  <Link className="text-violet-600 underline" href={event.url}>
-                    {event.url}
-                  </Link>
-                </div>
+              </div>
+              <div>
+                <h1 className="font-inter font-bold text-gray-500">
+                  What You'll Learn:
+                </h1>
+                <p className="font-montserrat">
+                  Lorem ipsum dolor sit, amet consectetur adipisicing elit. Rem,
+                  nulla. Deleniti architecto consequatur ullam mollitia
+                  perspiciatis, quaerat corrupti, sit enim obcaecati quisquam
+                  eum animi, magni reiciendis odio. Ex, consectetur pariatur!
+                </p>
+              </div>
+              <div>
+                <Link className="text-violet-600 underline" href={event.url}>
+                  {event.url}
+                </Link>
               </div>
             </div>
           </div>
-        ) : (
-          <p>Loading...</p>
-        )}
-        <div>
-          <RelatedEvents allEvents={relatedEvents} />
         </div>
-      </section>
-    </>
+      ) : (
+        <p>Loading...</p>
+      )}
+      {/* Related Events Section */}
+      <div>
+        {isRelatedEventsLoading ? (
+          <div>loading...</div>
+        ) : (
+          <RelatedEvents allEvents={relatedEvents} />
+        )}
+      </div>
+    </section>
   );
 };
 
