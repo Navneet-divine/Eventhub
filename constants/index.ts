@@ -8,8 +8,9 @@ export const NAV_LINK = [
         route: "/events/create-event",
     },
     {
-        label: "Profile",
-        route: "/profile",
+        label: "My Events",
+        route: "/my-events",
+
     },
 ];
 

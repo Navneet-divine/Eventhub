@@ -12,6 +12,7 @@ import locationIcon from "@/public/icons/location.svg";
 import { formatDateTime } from "@/utils/formatDate";
 import RelatedEvents from "../../components/RelatedEvents";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
+import { Loader } from "lucide-react";
 
 interface Event {
   _id: string;
@@ -134,7 +135,7 @@ const EventDetails = () => {
             <div className="flex flex-col gap-5">
               <div>
                 <p className="text-4xl font-inter font-semibold">
-                  {event.title}
+                  {event.title}dddfdfdfd
                 </p>
               </div>
               <div className="flex gap-x-5">
@@ -214,15 +215,20 @@ const EventDetails = () => {
           </div>
         </div>
       ) : (
-        <p>Loading...</p>
+        <div className="flex justify-center items-center w-full h-full">
+          <p>Loading...</p>
+        </div>
       )}
       {/* Related Events Section */}
       <div>
-        {isRelatedEventsLoading ? (
-          <div>loading...</div>
+        {/* {isRelatedEventsLoading ? (
+          <div className="flex justify-center items-center w-full h-full">
+            <p>Loading...</p>
+          </div>
         ) : (
           <RelatedEvents allEvents={relatedEvents} />
-        )}
+        )} */}
+        <RelatedEvents allEvents={relatedEvents} />
       </div>
     </section>
   );

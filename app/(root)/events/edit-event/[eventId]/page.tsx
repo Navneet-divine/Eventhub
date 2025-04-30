@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { getEventById } from "@/lib/actions/event.actions";
 
 interface EventDataProps {
-  eventId: string;
+  _id: string;
   title: string;
   description: string;
   price: string;
@@ -26,9 +26,11 @@ const EditEvent: React.FC = () => {
 
   useEffect(() => {
     const fetchEvent = async () => {
-      if (eventId) {
-        const res = await getEventById(eventId as string);
-        setEventData(res);
+      try {
+        const event = await getEventById(eventId as string);
+        setEventData(event);
+      } catch (error) {
+        console.error("Error fetching event data:", error);
       }
     };
 
@@ -42,7 +44,9 @@ const EditEvent: React.FC = () => {
           <h1 className="font-bold text-3xl font-inter">Edit Event</h1>
         </div>
         <div>
-          <EditEventForm eventId={eventId as string} />
+          {eventData && (
+            <EditEventForm event={eventData} eventId={eventData._id} />
+          )}
         </div>
       </div>
     </>

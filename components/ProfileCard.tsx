@@ -21,15 +21,11 @@ interface EventDataProps {
   }>;
 }
 
-const RelatedEvents: React.FC<EventDataProps> = ({ allEvents }) => {
+const ProfileCard: React.FC<EventDataProps> = ({ allEvents }) => {
   const { data: session } = useSession();
 
   return (
     <div className="flex flex-col gap-5 px-5 md:px-0">
-      <div>
-        <h1 className="text-3xl font-montserrat font-bold">Related Events</h1>
-      </div>
-
       {allEvents?.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {allEvents.map((event: any, i: number) => (
@@ -76,4 +72,4 @@ const RelatedEvents: React.FC<EventDataProps> = ({ allEvents }) => {
   );
 };
 
-export default RelatedEvents;
+export default ProfileCard;

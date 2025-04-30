@@ -24,7 +24,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { evnetFormSchema } from "@/lib/validator";
-import { eventDefaultValues } from "@/constants";
 import Dropdown from "./Dropdown";
 import { CloudUpload } from "lucide-react";
 
@@ -33,27 +32,65 @@ import calenderIcon from "@/public/icons/calendar.svg";
 import urlIcon from "@/public/icons/link.svg";
 import priceIcon from "@/public/icons/dollar.svg";
 
-import { createEvent, editEvent } from "@/lib/actions/event.actions";
+import { editEvent } from "@/lib/actions/event.actions";
 import { useRouter } from "next/navigation";
 
 type FormData = z.infer<typeof evnetFormSchema>;
 
 interface EditEventFormProps {
   eventId: string;
+  event: {
+    _id: string;
+    title: string;
+    description: string;
+    location: string;
+    imageUrl?: string;
+    price: string;
+    url: string;
+    isFree: boolean;
+    category: string;
+    startDateTime: Date;
+    endDateTime: Date;
+  };
 }
 
-const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
+const EditEventForm: React.FC<EditEventFormProps> = ({ event, eventId }) => {
+  const [filedValue, setFieledVlue] = useState({
+    title: event.title,
+    description: event.description,
+    location: event.location,
+    imageUrl: event.imageUrl,
+    price: event.price,
+    url: event.url,
+    isFree: event.isFree,
+    category: event.category,
+    startDateTime: new Date(event.startDateTime),
+    endDateTime: new Date(event.endDateTime),
+  });
   const router = useRouter();
   const { data: session } = useSession();
   const fileUpload = useRef<HTMLInputElement>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    event.imageUrl ?? null
+  );
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(evnetFormSchema),
-    defaultValues: eventDefaultValues,
+    defaultValues: {
+      title: event.title,
+      description: event.description,
+      location: event.location,
+      imageUrl: event.imageUrl || "",
+      price: event.price,
+      url: event.url,
+      isFree: event.isFree,
+      category: event.category,
+      startDateTime: new Date(event.startDateTime),
+      endDateTime: new Date(event.endDateTime),
+    },
   });
 
   const handleUploadFile = () => {
@@ -95,10 +132,17 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
 
       const formData = new FormData();
 
-      Object.entries(values).forEach(([key, value]) => {
+      // Add all form values to formData
+      Object.entries(filedValue).forEach(([key, value]) => {
         if (key !== "imageUrl" && value !== undefined && value !== null) {
-          if (value instanceof Date) {
-            formData.append(key, value.toISOString());
+          if (key === "startDateTime" || key === "endDateTime") {
+            // Ensure we're passing Date objects to the server action
+            formData.append(
+              key,
+              value instanceof Date
+                ? value.toISOString()
+                : new Date(value as any).toISOString()
+            );
           } else {
             formData.append(key, String(value));
           }
@@ -107,25 +151,24 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
 
       if (imageFile) {
         formData.append("imageUrl", imageFile);
-      }
-
-      for (const pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
+      } else if (event.imageUrl) {
+        // Keep the existing image if no new one was uploaded
+        formData.append("imageUrl", event.imageUrl);
       }
 
       const result = await editEvent(eventId as string, formData);
       console.log(result);
 
       if (result.success === false) {
-        console.error("Error creating event:", result.error);
+        console.error("Error updating event:", result.error);
       } else {
         form.reset();
         setImagePreview(null);
         setImageFile(null);
+        router.push(`/events/event-detail/${result._id}`);
       }
-      router.push(`/events/event-detail/${result._id}`);
     } catch (error) {
-      console.error("Failed to create event:", error);
+      console.error("Failed to update event:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -145,7 +188,11 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
                     <Input
                       placeholder="Event title"
                       {...field}
-                      onChange={field.onChange}
+                      value={filedValue.title}
+                      onChange={(e) => {
+                        field.onChange(e.target.value); // Make sure to pass the value, not the event
+                        setFieledVlue({ ...filedValue, title: e.target.value });
+                      }}
                       className="bg-white"
                     />
                   </FormControl>
@@ -162,10 +209,8 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
                 <FormItem>
                   <FormControl>
                     <Dropdown
-                      onChangeHandler={(value) => {
-                        field.onChange(value);
-                        form.setValue("category", value);
-                      }}
+                      onChangeHandler={field.onChange}
+                      value={filedValue.category}
                     />
                   </FormControl>
                   <FormMessage />
@@ -184,6 +229,14 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
                       <Textarea
                         placeholder="Description"
                         {...field}
+                        value={filedValue.description}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          setFieledVlue({
+                            ...filedValue,
+                            description: e.target.value,
+                          });
+                        }}
                         className="h-64"
                       />
                     </FormControl>
@@ -243,11 +296,14 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
                           accept="image/*"
                           className="hidden"
                           ref={fileUpload}
-                          onChange={handleFileChange}
+                          onChange={(e) => {
+                            handleFileChange(e);
+                            form.clearErrors("imageUrl");
+                          }}
                         />
                       </FormControl>
-                      <FormMessage />
                     </div>
+                    {imagePreview === "" ? <FormMessage /> : <FormMessage />}
                   </FormItem>
                 )}
               />
@@ -273,6 +329,14 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
                       <Input
                         placeholder="Event location or online"
                         {...field}
+                        value={filedValue.location}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          setFieledVlue({
+                            ...filedValue,
+                            location: e.target.value,
+                          });
+                        }}
                         className="pl-12 h-[54px] rounded-full bg-gray-50"
                       />
                     </div>
@@ -304,6 +368,14 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
                         <Input
                           placeholder="Price"
                           {...field}
+                          value={filedValue.price}
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setFieledVlue({
+                              ...filedValue,
+                              price: e.target.value,
+                            });
+                          }}
                           className="pl-12 h-[54px] rounded-full bg-gray-50 w-full"
                         />
                       </div>
@@ -327,8 +399,14 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
                     <FormControl>
                       <Checkbox
                         id="isFree"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                        checked={filedValue.isFree}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked);
+                          setFieledVlue({
+                            ...filedValue,
+                            isFree: Boolean(checked),
+                          });
+                        }}
                         className="h-5 w-5 border-2 border-violet-600"
                       />
                     </FormControl>
@@ -355,8 +433,12 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
                       </div>
                       <Input
                         placeholder="URL"
-                        onChange={field.onChange}
-                        value={field.value}
+                        value={filedValue.url}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          setFieledVlue({ ...filedValue, url: e.target.value });
+                        }}
+                        type="url"
                         className="pl-12 h-[54px] rounded-full bg-gray-50"
                       />
                     </div>
@@ -384,8 +466,20 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
                         />
                       </div>
                       <DatePicker
-                        selected={field.value}
-                        onChange={field.onChange}
+                        selected={
+                          filedValue.startDateTime instanceof Date
+                            ? filedValue.startDateTime
+                            : new Date(filedValue.startDateTime)
+                        }
+                        onChange={(date) => {
+                          if (date) {
+                            field.onChange(date);
+                            setFieledVlue({
+                              ...filedValue,
+                              startDateTime: date,
+                            });
+                          }
+                        }}
                         showTimeSelect
                         timeInputLabel="Time:"
                         dateFormat="MM/dd/yy h:mm aa"
@@ -417,8 +511,17 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ eventId }) => {
                         />
                       </div>
                       <DatePicker
-                        selected={field.value}
-                        onChange={field.onChange}
+                        selected={
+                          filedValue.endDateTime instanceof Date
+                            ? filedValue.endDateTime
+                            : new Date(filedValue.endDateTime)
+                        }
+                        onChange={(date) => {
+                          if (date) {
+                            field.onChange(date);
+                            setFieledVlue({ ...filedValue, endDateTime: date });
+                          }
+                        }}
                         showTimeSelect
                         timeInputLabel="Time:"
                         dateFormat="MM/dd/yy h:mm aa"

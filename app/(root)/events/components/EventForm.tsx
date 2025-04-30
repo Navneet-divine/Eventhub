@@ -236,11 +236,14 @@ const EventForm: React.FC = () => {
                           accept="image/*"
                           className="hidden"
                           ref={fileUpload}
-                          onChange={handleFileChange}
+                          onChange={(e) => {
+                            handleFileChange(e);
+                            form.clearErrors("imageUrl");
+                          }}
                         />
                       </FormControl>
-                      <FormMessage />
                     </div>
+                    {imagePreview === "" ? <FormMessage /> : <FormMessage />}
                   </FormItem>
                 )}
               />

@@ -9,10 +9,8 @@ import { revalidatePath } from "next/cache"
 
 export async function createEvent(formData: FormData, userdata: any) {
     try {
-        await connectToDB()
+        await connectToDB();
 
-
-        console.log("Received FormData in server action:")
         for (const [key, value] of formData.entries()) {
             console.log(`${key}: ${typeof value === "object" ? "File object" : value}`)
         }
@@ -71,7 +69,13 @@ export async function createEvent(formData: FormData, userdata: any) {
             imageUrl: imageUrl,
         })
 
+        const user = await User.findOne({ email: userdata.email })
+        if (!user) {
+            throw new Error("User does not exist")
+        }
 
+        user.events.push(createdEvent._id)
+        await user.save()
 
         return JSON.parse(JSON.stringify(createdEvent))
 

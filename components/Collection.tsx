@@ -51,7 +51,7 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
   };
 
   return (
-    <div className={`px-5 lg:px-28 xl:px-40 pt-8 ${className}`}>
+    <div className={`px-5 lg:px-28 xl:px-40 pt-8  ${className}`}>
       <div>
         <h2 className="text-2xl sm:text-3xl lg:text-3xl font-bold font-montserrat">
           Trusted by <br /> Thousands of Events
@@ -122,7 +122,7 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
         {/* Card Component */}
 
         {/* Card Component */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 pt-10 ">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 pt-10 min-h-[300px]">
           {allEvents?.length > 0 ? (
             allEvents.map((event: any, i: number) => (
               <Card
@@ -143,9 +143,11 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
               />
             ))
           ) : (
-            <div className="flex justify-center items-center flex-col gap-1 pt-10">
-              <h1 className="font-bold text-xl">No Events Found</h1>
-              <p className="text-sm font-inter text-gray-600">
+            <div className="flex justify-center items-center flex-col gap-1 col-span-full">
+              <h1 className="font-bold text-xl font-montserrat">
+                No Events Found
+              </h1>
+              <p className="text-sm font-montserrat text-gray-600">
                 Come back later
               </p>
             </div>

@@ -9,6 +9,7 @@ interface User {
     createdAt?: Date;
     updatedAt?: Date;
     color: string
+    events: string[]; // Array of event IDs
 }
 
 const userSchema = new Schema<User>({
@@ -30,6 +31,12 @@ const userSchema = new Schema<User>({
     password: {
         type: String,
     },
+    events: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Event',
+        }
+    ],
 }, {
     timestamps: true,
 });
