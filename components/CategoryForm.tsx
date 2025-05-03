@@ -3,21 +3,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import Dropdown from "@/app/(root)/events/components/Dropdown";
 
-const CategoryForm: React.FC = () => {
+const schema = z.object({
+  category: z.string().min(1, "Please select a category"),
+});
+
+type CategoryFormProps = {
+  onCategoryChange: (category: string) => void;
+};
+
+const CategoryForm: React.FC<CategoryFormProps> = ({ onCategoryChange }) => {
   const form = useForm({
+    resolver: zodResolver(schema),
     defaultValues: {
       category: "",
     },
@@ -33,7 +33,10 @@ const CategoryForm: React.FC = () => {
             <FormItem className="w-full">
               <FormControl>
                 <Dropdown
-                  onChangeHandler={field.onChange}
+                  onChangeHandler={(value) => {
+                    field.onChange(value);
+                    onCategoryChange(value);
+                  }}
                   value={field.value}
                   hideAddCategory={true}
                 />

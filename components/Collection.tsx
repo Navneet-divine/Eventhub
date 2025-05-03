@@ -26,8 +26,8 @@ interface CollectionProps {
 
 const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
   const [events, setEvents] = useState(allEvents);
-  const [loading, setLoading] = useState(false); // Loading state
 
   const { data: session } = useSession();
   const form = useForm<FormSchemaType>({
@@ -40,22 +40,23 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      setLoading(true);
       try {
-        const res = await getAllEvent(8, search);
+        const res = await getAllEvent(8, search, category);
         setEvents(res.data);
       } catch (error) {
         console.error("Error fetching events:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchEvents();
-  }, [search]);
+  }, [search, category]);
 
   function handleSearch(title: string) {
     setSearch(title);
+  }
+
+  function handleCategoryChange(newCategory: string) {
+    setCategory(newCategory);
   }
 
   return (
@@ -69,16 +70,14 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
       {/* div 2 */}
       <div className="w-full items-center flex flex-col gap-4 md:flex-row md:justify-between md:gap-6 px-2 mt-6">
         <div className="w-full">
-          <SearchForm onSearch={handleSearch} /> {/* Search form */}
+          <SearchForm onSearch={handleSearch} />
         </div>
         <div className="w-full">
-          <CategoryForm /> {/* Category filter form */}
+          <CategoryForm onCategoryChange={handleCategoryChange} />
         </div>
       </div>
 
-      {/* div 3 */}
       <div>
-        {/* Display events */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 pt-10 min-h-[300px]">
           {events?.length > 0 ? (
             events.map((event: any, i: number) => (

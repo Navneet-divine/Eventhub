@@ -113,19 +113,26 @@ export async function getEventById(eventId: string) {
     }
 }
 
-export async function getAllEvent(limit = 8, query = "") {
+export async function getAllEvent(limit = 8, query = "", category = "") {
     try {
         await connectToDB();
 
-        let events;
-        const searchQuery = query.trim() ? { title: { $regex: query.trim(), $options: "i" } } : {};
 
-        events = await Event.find(searchQuery)
+        const searchQuery = query.trim()
+            ? { title: { $regex: query.trim(), $options: "i" } }
+            : {};
+
+        const categoryFilter = category ? { category: category } : {};
+
+        const filter = { ...searchQuery, ...categoryFilter };
+
+
+        const events = await Event.find(filter)
             .populate("organizer")
             .sort({ createdAt: "desc" })
             .limit(limit);
 
-        const eventCount = await Event.countDocuments(searchQuery);
+        const eventCount = await Event.countDocuments(filter);
 
         if (!events) {
             throw new Error("Error fetching events");
@@ -144,8 +151,6 @@ export async function getAllEvent(limit = 8, query = "") {
         };
     }
 }
-
-
 
 export async function editEvent(eventId: string, formData: FormData) {
     try {
