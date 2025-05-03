@@ -10,6 +10,7 @@ interface User {
     updatedAt?: Date;
     color: string
     events: string[]; // Array of event IDs
+    bookedEvents: string[]
 }
 
 const userSchema = new Schema<User>({
@@ -37,6 +38,12 @@ const userSchema = new Schema<User>({
             ref: 'Event',
         }
     ],
+    bookedEvents: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Event"
+        }
+    ]
 }, {
     timestamps: true,
 });

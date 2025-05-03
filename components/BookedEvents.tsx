@@ -2,28 +2,28 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { getUserEvents } from "@/lib/actions/user.actions";
+import { getUserBookedEvents, getUserEvents } from "@/lib/actions/user.actions";
 import ProfileCard from "@/components/ProfileCard";
 import notFound from "@/public/images/no-data .webp";
 import Image from "next/image";
-import Link from "next/link";
 
-const MyEvents: React.FC = () => {
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  location: string;
+  organizer: string;
+  category: string;
+  startDateTime: Date;
+  endDateTime: Date;
+  url: string;
+  isFree: boolean;
+}
+
+const BookedEvents: React.FC = () => {
   const { data: session, status } = useSession();
-  interface Event {
-    id: string;
-    title: string;
-    description: string;
-    price: number;
-    imageUrl: string;
-    location: string;
-    organizer: string;
-    category: string;
-    startDateTime: Date;
-    endDateTime: Date;
-    url: string;
-    isFree: boolean;
-  }
 
   const [events, setEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
@@ -35,7 +35,7 @@ const MyEvents: React.FC = () => {
 
     try {
       setLoading(true);
-      const res = await getUserEvents(session.user.email, pageNum, 8);
+      const res = await getUserBookedEvents(session.user.email, pageNum, 8);
       if (res) {
         if (pageNum === 1) {
           setEvents(res.events);
@@ -95,17 +95,8 @@ const MyEvents: React.FC = () => {
           </div>
           <div>
             <h1 className="text-2xl font-montserrat font-semibold text-center mt-3">
-              No events found
+              No Booked events found.
             </h1>
-            <p className="text-center mt-1 text-sm font-inter">
-              You have not created any events.
-            </p>
-            <p className="text-center mt-1 text-sm font-inter">
-              Create an event to see it here.{" "}
-              <Link href="/events/create-event" className="text-violet-600">
-                Create Event
-              </Link>
-            </p>
           </div>
         </div>
       )}
@@ -113,4 +104,4 @@ const MyEvents: React.FC = () => {
   );
 };
 
-export default MyEvents;
+export default BookedEvents;

@@ -1,7 +1,7 @@
 import EventForm from "../components/EventForm";
 
 export const metadata = {
-  title: "Create Event",
+  title: "Eventhub | Create Event",
   description: "Create a new event using the event form.",
 };
 

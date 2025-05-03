@@ -14,6 +14,7 @@ export interface IEvent extends Document {
     url?: string;
     category: string
     organizer: { _id: string, firstName: string }
+    bookedBy: string
 }
 
 const EventSchema = new Schema({
@@ -29,6 +30,13 @@ const EventSchema = new Schema({
     url: { type: String },
     category: String,
     organizer: { type: Schema.Types.ObjectId, ref: 'User' },
+    bookedBy: {
+        type: Schema.Types.ObjectId, ref: "User"
+    },
+    isBooked: {
+        type: Boolean,
+        default: false
+    }
 
 })
 

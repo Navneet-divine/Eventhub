@@ -234,7 +234,6 @@ export async function getRelatedEvent(eventId: string) {
         }
         let relatedEvent: any[] = [];
 
-        // Ensure the event being fetched is not included in the related events
         if (event.isFree) {
             relatedEvent = await Event.find({ isFree: true, _id: { $ne: eventId } });
         } else if (Number(event.price) > 0) {
@@ -251,7 +250,6 @@ export async function getRelatedEvent(eventId: string) {
             relatedEvent = await Event.find({ isFree: true, _id: { $ne: eventId } });
         }
 
-        console.log("Related events:", relatedEvent);
 
         return JSON.parse(JSON.stringify(relatedEvent));
     } catch (error) {
@@ -262,6 +260,50 @@ export async function getRelatedEvent(eventId: string) {
         return { success: false, error: "Something went wrong" };
     }
 }
+
+export async function toggleBookEvent(eventId: string, email: string) {
+    try {
+        await connectToDB();
+
+        const event = await Event.findById(eventId);
+        if (!event) {
+            return { success: false, error: "Event not found" };
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return { success: false, error: "User not found" };
+        }
+
+        const isAlreadyBooked = user.bookedEvents.some((eid: string) =>
+            eid.toString() === eventId
+        );
+
+        if (isAlreadyBooked) {
+            user.bookedEvents = user.bookedEvents.filter((eid: string) => eid.toString() !== eventId);
+            event.isBooked = false;
+            await user.save();
+            await event.save();
+            revalidatePath(`/events/event-detail/${eventId}`);
+            return { success: true, message: "Event unbooked successfully" };
+        } else {
+            user.bookedEvents.push(eventId);
+            event.isBooked = true;
+            await user.save();
+            await event.save();
+            revalidatePath(`/events/event-detail/${eventId}`);
+            return { success: true, message: "Event booked successfully" };
+        }
+
+    } catch (error) {
+        if (error instanceof Error) {
+            return { success: false, error: error.message || "Something went wrong" };
+        }
+        return { success: false, error: "Something went wrong" };
+    }
+}
+
+
 
 
 
