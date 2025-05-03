@@ -80,11 +80,13 @@ const Card: React.FC<CardProps> = ({
 
       {/* Event Details */}
       <div className="p-3">
-        <div className="flex items-center gap-4 text-sm mt-2">
+        <div className="flex items-center  gap-4 text-sm mt-2">
           {/* Price */}
-          <p className="text-green-600 font-semibold font-inter">
-            {price > 0 ? `$${price}` : "Free"}
-          </p>
+          <div className="bg-green-100 px-2 rounded-full">
+            <p className="text-green-500 font-semibold font-inter">
+              {price > 0 ? `$${price}` : "Free"}
+            </p>
+          </div>
 
           {/* Category Badge */}
           <div className="flex items-center justify-center bg-gray-300 px-2 rounded-full">

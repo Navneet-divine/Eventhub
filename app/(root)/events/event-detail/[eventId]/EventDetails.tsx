@@ -183,9 +183,11 @@ const EventDetails = () => {
               </div>
               <div className="flex gap-x-5">
                 {Number(event.price) > 0 ? (
-                  <p className="text-green-600 font-semibold font-inter">
-                    ${event.price}
-                  </p>
+                  <div className="px-2 bg-green-100 rounded-full">
+                    <p className="text-green-600 font-semibold font-inter">
+                      ${event.price}
+                    </p>
+                  </div>
                 ) : (
                   <p className="text-green-600 font-semibold font-inter">
                     Free

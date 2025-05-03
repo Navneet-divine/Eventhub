@@ -35,12 +35,14 @@ type DropdownProps = {
   value?: string;
   onChangeHandler?: (value: string) => void;
   category?: string;
+  hideAddCategory: boolean;
 };
 
 const Dropdown: React.FC<DropdownProps> = ({
   onChangeHandler,
   value,
   category,
+  hideAddCategory,
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState("");
@@ -74,7 +76,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   return (
     <div className="space-y-2">
       <Select onValueChange={onChangeHandler} defaultValue={value}>
-        <SelectTrigger className="w-full border-none">
+        <SelectTrigger className="w-full border-none shadow-none">
           {category ? (
             <SelectValue placeholder={category} />
           ) : (
@@ -99,7 +101,9 @@ const Dropdown: React.FC<DropdownProps> = ({
         <AlertDialogTrigger asChild>
           <Button
             variant="outline"
-            className="text-violet-600 border-none w-fit cursor-pointer hover:text-violet-600 px-2"
+            className={`text-violet-600 border-none w-fit cursor-pointer hover:text-violet-600 px-2 ${
+              hideAddCategory ? "hidden" : ""
+            }`}
           >
             Add new category
           </Button>

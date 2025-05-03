@@ -141,7 +141,7 @@ const EventForm: React.FC = () => {
                     <Input
                       placeholder="Event title"
                       {...field}
-                      className="bg-white"
+                      className="bg-white shadow-none"
                     />
                   </FormControl>
                   <FormMessage />
@@ -159,6 +159,7 @@ const EventForm: React.FC = () => {
                     <Dropdown
                       onChangeHandler={field.onChange}
                       value={field.value}
+                      hideAddCategory={false}
                     />
                   </FormControl>
                   <FormMessage />

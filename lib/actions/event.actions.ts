@@ -113,30 +113,39 @@ export async function getEventById(eventId: string) {
     }
 }
 
-export async function getAllEvent(limit = 8) {
+export async function getAllEvent(limit = 8, query = "") {
     try {
-        await connectToDB()
-        const events = await Event.find().populate("organizer").sort({ createdAt: "desc" }).skip(0).limit(6)
-        const eventCount = await Event.countDocuments()
+        await connectToDB();
+
+        let events;
+        const searchQuery = query.trim() ? { title: { $regex: query.trim(), $options: "i" } } : {};
+
+        events = await Event.find(searchQuery)
+            .populate("organizer")
+            .sort({ createdAt: "desc" })
+            .limit(limit);
+
+        const eventCount = await Event.countDocuments(searchQuery);
 
         if (!events) {
-            throw new Error("Error fetching events")
+            throw new Error("Error fetching events");
         }
 
         return {
             data: JSON.parse(JSON.stringify(events)),
             totalPages: Math.ceil(eventCount / limit),
             success: true,
-        }
-
+        };
     } catch (error) {
-        console.error("Error in getAllEvent:", error)
-        if (error instanceof Error) {
-            return { success: false, error: error.message || "Something went wrong" }
-        }
-        return { success: false, error: "Something went wrong" }
+        console.error("Error in getAllEvent:", error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Something went wrong",
+        };
     }
 }
+
+
 
 export async function editEvent(eventId: string, formData: FormData) {
     try {

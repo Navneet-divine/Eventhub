@@ -1,29 +1,17 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-
-import searchIcon from "@/public/icons/search.svg";
-import Image from "next/image";
-import Dropdown from "@/app/(root)/events/components/Dropdown";
-import Card from "@/components/Card";
 import { useSession } from "next-auth/react";
+import { getAllEvent } from "@/lib/actions/event.actions";
+import Card from "@/components/Card";
+import SearchForm from "./SearchForm";
+import CategoryForm from "./CategoryForm";
 
 const formSchema = z.object({
-  search: z.string().min(2, {
-    message: "Please enter at least 2 characters for location.",
-  }),
+  search: z.string().min(0), // Allow empty search string to fetch all events
   category: z.string().min(1, {
     message: "Please select a category.",
   }),
@@ -37,6 +25,10 @@ interface CollectionProps {
 }
 
 const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
+  const [search, setSearch] = useState("");
+  const [events, setEvents] = useState(allEvents);
+  const [loading, setLoading] = useState(false); // Loading state
+
   const { data: session } = useSession();
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
@@ -46,85 +38,50 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
     },
   });
 
-  const onSubmit = (values: FormSchemaType) => {
-    console.log("Form values:", values);
-  };
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        const res = await getAllEvent(8, search);
+        setEvents(res.data);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [search]);
+
+  function handleSearch(title: string) {
+    setSearch(title);
+  }
 
   return (
-    <div className={`px-5 lg:px-28 xl:px-40 pt-8  ${className}`}>
+    <div className={`px-5 lg:px-28 xl:px-40 pt-8 ${className}`}>
       <div>
         <h2 className="text-2xl sm:text-3xl lg:text-3xl font-bold font-montserrat">
           Trusted by <br /> Thousands of Events
         </h2>
       </div>
+
       {/* div 2 */}
-      <div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="flex flex-col gap-4 md:flex-row md:gap-6">
-              {/* Search Input */}
-              <FormField
-                control={form.control}
-                name="search"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormControl>
-                      <div className="relative w-full h-[54px]">
-                        {/* Search Icon */}
-                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center">
-                          <Image
-                            src={searchIcon}
-                            alt="Search"
-                            width={20}
-                            height={20}
-                          />
-                        </div>
-
-                        {/* Input */}
-                        <Input
-                          {...field}
-                          placeholder="Search events..."
-                          className="pl-12 h-full rounded-full "
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Category Dropdown */}
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormControl>
-                      <Dropdown
-                        onChangeHandler={field.onChange}
-                        value={field.value}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <Button type="submit" className="rounded-full px-8">
-              Submit
-            </Button>
-          </form>
-        </Form>
+      <div className="w-full items-center flex flex-col gap-4 md:flex-row md:justify-between md:gap-6 px-2 mt-6">
+        <div className="w-full">
+          <SearchForm onSearch={handleSearch} /> {/* Search form */}
+        </div>
+        <div className="w-full">
+          <CategoryForm /> {/* Category filter form */}
+        </div>
       </div>
+
       {/* div 3 */}
       <div>
-        {/* Card Component */}
-
-        {/* Card Component */}
+        {/* Display events */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 pt-10 min-h-[300px]">
-          {allEvents?.length > 0 ? (
-            allEvents.map((event: any, i: number) => (
+          {events?.length > 0 ? (
+            events.map((event: any, i: number) => (
               <Card
                 key={i}
                 eventId={event._id}
@@ -137,9 +94,7 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
                 category={event.category}
                 startDateTime={event.startDateTime}
                 organizer={event.organizer.name}
-                showEditDelete={
-                  session?.user.email === event.organizer.email ? true : false
-                }
+                showEditDelete={session?.user.email === event.organizer.email}
               />
             ))
           ) : (

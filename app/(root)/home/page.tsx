@@ -11,15 +11,11 @@ export const metadata: Metadata = {
 
 const Dashboard: React.FC = async () => {
   const allEvents = await getAllEvent();
-  console.log(allEvents.data);
-  console.log(allEvents.data.length);
 
   return (
     <div>
       <HeroSection />
-
       <Collection allEvents={allEvents.data} />
-
       <Logout />
     </div>
   );
