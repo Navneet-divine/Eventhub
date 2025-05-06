@@ -13,6 +13,7 @@ const MyEvent: React.FC = () => {
     hasMore: boolean;
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasTriedLoadingMore, setHasTriedLoadingMore] = useState(false);
 
   useEffect(() => {
     const fetchUserEvents = async () => {
@@ -35,7 +36,7 @@ const MyEvent: React.FC = () => {
     fetchUserEvents();
   }, [session?.user?.email]);
 
-  if (loading) return <p className="px-5 pt-10">Loading...</p>;
+ 
 
   return (
     <>

@@ -8,12 +8,16 @@ import { NAV_LINK } from "@/constants/index";
 import { Button } from "./ui/button";
 import { useSession } from "next-auth/react";
 import { MobileNav } from "./MobileNav";
+import { LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const { data: session } = useSession();
+  const pathName = usePathname();
 
   return (
-    <div className="flex justify-between items-center p-3 px-5 lg:px-28 xl:px-40">
+    <div className="flex justify-between items-center p-3 px-5 lg:px-28 xl:px-40 border border-r-gray-200">
       <div>
         <div className="flex items-center">
           <Image src={logo.src} alt="logo" width={35} height={35} />
@@ -30,7 +34,11 @@ export default function Header() {
                   <Link
                     key={index}
                     href={link.route}
-                    className="text-gray-500 hover:text-gray-900"
+                    className={`text-gray-500 font-inter hover:text-violet-500 ${
+                      pathName === link.route
+                        ? "text-violet-600 hover:text-violet-600"
+                        : ""
+                    }`}
                   >
                     {link.label}
                   </Link>
@@ -43,14 +51,22 @@ export default function Header() {
 
       <div className="flex items-center justify-end h-full">
         {session?.user.image && (
-          <div className="rounded-full h-9 mr-2 shrink-0 w-9 cursor-pointer">
-            <Image
-              src={session.user.image}
-              alt="userAvatar"
-              width={100}
-              height={100}
-              className="rounded-full"
-            />
+          <div className="flex items-center justify-center space-x-2">
+            <div
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="rounded-full h-9 w-9 cursor-pointer flex items-center justify-center"
+            >
+              <LogOut className="text-red-400" />
+            </div>
+            <div className="rounded-full h-9 w-9 cursor-pointer overflow-hidden">
+              <Image
+                src={session.user.image}
+                alt="userAvatar"
+                width={36}
+                height={36}
+                className="rounded-full"
+              />
+            </div>
           </div>
         )}
 
@@ -67,12 +83,20 @@ export default function Header() {
               />
             </div>
           ) : (
-            <div
-              className="flex justify-center items-center rounded-full h-9 mr-2 shrink-0 w-9 text-white font-montserrat cursor-pointer"
-              style={{ backgroundColor: session.user.color }}
-            >
-              {session.user.name?.charAt(0).toUpperCase()}
-            </div>
+            <>
+              <div
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="rounded-full h-9 w-9 cursor-pointer flex items-center justify-center"
+              >
+                <LogOut className="text-red-400" />
+              </div>
+              <div
+                className="flex justify-center items-center rounded-full h-9 mr-2 shrink-0 w-9 text-white font-montserrat cursor-pointer"
+                style={{ backgroundColor: session.user.color }}
+              >
+                {session.user.name?.charAt(0).toUpperCase()}
+              </div>
+            </>
           ))}
 
         {session && (

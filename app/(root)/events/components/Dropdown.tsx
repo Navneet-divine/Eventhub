@@ -36,6 +36,7 @@ type DropdownProps = {
   onChangeHandler?: (value: string) => void;
   category?: string;
   hideAddCategory: boolean;
+  hideAllCategory: boolean;
 };
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -43,6 +44,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   value,
   category,
   hideAddCategory,
+  hideAllCategory,
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState("");
@@ -87,6 +89,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Categories</SelectLabel>
+            {hideAllCategory && <SelectItem value="all">All</SelectItem>}
             {categories.map((category, i) => (
               <SelectItem key={i} value={category.name}>
                 {category.name}

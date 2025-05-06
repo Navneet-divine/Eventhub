@@ -7,6 +7,7 @@ import ProfileCard from "@/components/ProfileCard";
 import notFound from "@/public/images/no-data .webp";
 import Image from "next/image";
 import Link from "next/link";
+import Loader from "./Loader";
 
 const MyEvents: React.FC = () => {
   const { data: session, status } = useSession();
@@ -29,13 +30,14 @@ const MyEvents: React.FC = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
+  const [hasTriedLoadingMore, setHasTriedLoadingMore] = useState(false);
 
   const fetchUserEvents = async (pageNum = 1) => {
     if (!session?.user?.email) return;
 
     try {
       setLoading(true);
-      const res = await getUserEvents(session.user.email, pageNum, 8);
+      const res = await getUserEvents(session.user.email, pageNum, 9);
       if (res) {
         if (pageNum === 1) {
           setEvents(res.events);
@@ -60,11 +62,11 @@ const MyEvents: React.FC = () => {
   const handleLoadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
+    setHasTriedLoadingMore(true);
     fetchUserEvents(nextPage);
   };
 
-  if (loading && events.length === 0)
-    return <p className="px-5 pt-10">Loading...</p>;
+  if (loading && events.length === 0) return <Loader />;
 
   return (
     <div>
@@ -73,14 +75,21 @@ const MyEvents: React.FC = () => {
           <ProfileCard allEvents={events} />
           {hasMore && (
             <div className="flex justify-center mt-8">
-              <button
-                onClick={handleLoadMore}
-                className="bg-violet-600 text-white font-montserrat cursor-pointer px-4 py-2 rounded hover:bg-violet-700 transition"
-                disabled={loading}
-              >
-                {loading ? "Loading..." : "Load More"}
-              </button>
+              {events.length > 9 && (
+                <button
+                  onClick={handleLoadMore}
+                  className="bg-violet-600 text-white font-montserrat cursor-pointer px-4 py-2 rounded hover:bg-violet-700 transition"
+                  disabled={loading}
+                >
+                  {loading ? "Loading..." : "Load More"}
+                </button>
+              )}
             </div>
+          )}
+          {!hasMore && hasTriedLoadingMore && (
+            <p className="text-center mt-4 text-sm text-gray-500">
+              No more events to load.
+            </p>
           )}
         </>
       ) : (

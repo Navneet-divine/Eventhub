@@ -18,6 +18,7 @@ import RelatedEvents from "../../components/RelatedEvents";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Loader from "@/components/Loader";
 
 interface Event {
   _id: string;
@@ -144,142 +145,146 @@ const EventDetails = () => {
   }
 
   return (
-    <section className="md:px-5 lg:px-28 xl:px-40 pt-5 pb-10 h-full">
+    <section className="md:px-5 lg:px-28 xl:px-40 md:pt-5  pb-10 h-full">
       {event ? (
-        <div className="md:flex gap-15 md:gap-5 lg:gap-15">
-          {/* Event Image Section */}
-          <div>
-            <Image
-              className="h-[90%] object-cover max-md:hidden"
-              src={event.imageUrl}
-              alt="event img"
-              width={900}
-              height={800}
-            />
-            <Image
-              className="w-full max-md:h-[300px] md:hidden object-cover"
-              src={event.imageUrl}
-              alt="event img"
-              width={300}
-              height={400}
-            />
-          </div>
-          {/* Event Info Section */}
-          <div className="w-full md:mt-5 p-4 md:p-0">
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center justify-between w-full">
-                <div>
-                  <p className="text-4xl font-inter font-semibold">
-                    {event.title}dddfdfdfd
-                  </p>
+        <>
+          <div className="md:flex gap-15 md:gap-5 lg:gap-15">
+            {/* Event Image Section */}
+            <div>
+              <Image
+                className="h-[90%] object-cover max-md:hidden"
+                src={event.imageUrl}
+                alt="event img"
+                width={900}
+                height={800}
+              />
+              <Image
+                className="w-full max-md:h-[300px] md:hidden object-cover"
+                src={event.imageUrl}
+                alt="event img"
+                width={300}
+                height={400}
+              />
+            </div>
+            {/* Event Info Section */}
+            <div className="w-full md:mt-5 p-4 md:p-0">
+              <div className="flex flex-col gap-5">
+                <div className="flex items-start justify-between w-full">
+                  <div className="flex-1">
+                    <p className="text-4xl font-inter font-semibold break-words break-all leading-snug">
+                      {event.title}
+                    </p>
+                  </div>
+                  <div
+                    onClick={handleToggleBookmark}
+                    className="cursor-pointer ml-3 mt-3"
+                  >
+                    {isBooked ? (
+                      <BookmarkCheck size={30} className="text-violet-500" />
+                    ) : (
+                      <Bookmark size={30} className="text-violet-400" />
+                    )}
+                  </div>
                 </div>
-                <div onClick={handleToggleBookmark} className="cursor-pointer">
-                  {isBooked ? (
-                    <BookmarkCheck size={30} className="text-violet-500" />
+
+                <div className="flex gap-x-5">
+                  {Number(event.price) > 0 ? (
+                    <div className="px-2 bg-green-100  rounded-full">
+                      <p className="text-green-600 font-semibold font-inter">
+                        ${event.price}
+                      </p>
+                    </div>
                   ) : (
-                    <Bookmark size={30} className="text-violet-400" />
+                    <p className="text-green-600 font-semibold font-inter">
+                      Free
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-center bg-gray-300 px-2 rounded-full">
+                    <p className="text-gray-600 font-semibold font-inter text-sm">
+                      {event.category}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-montserrat text-sm font-semibold">
+                      by{" "}
+                      <span className="text-violet-600 font-inter">
+                        {event.organizer.name}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  {event.price !== "" && (
+                    <Button
+                      onClick={handleCheckout}
+                      disabled={hasPurchased}
+                      className={`w-30 rounded-full h-10 font-inter ${
+                        hasPurchased
+                          ? "bg-green-500 cursor-not-allowed"
+                          : "bg-violet-600 hover:bg-violet-700 cursor-pointer"
+                      }`}
+                    >
+                      {hasPurchased ? "Purchased" : "Get Ticket"}
+                    </Button>
                   )}
                 </div>
-              </div>
-              <div className="flex gap-x-5">
-                {Number(event.price) > 0 ? (
-                  <div className="px-2 bg-green-100 rounded-full">
-                    <p className="text-green-600 font-semibold font-inter">
-                      ${event.price}
-                    </p>
+                {/* Event Date and Location */}
+                <div>
+                  <div className="flex gap-2 items-center">
+                    <div>
+                      <Image src={locationIcon} alt="" width={30} height={30} />
+                    </div>
+                    <div>
+                      <p>
+                        {formatDateTime(event.startDateTime)} /{" "}
+                        {formatDateTime(event.endDateTime)}
+                      </p>
+                    </div>
                   </div>
-                ) : (
-                  <p className="text-green-600 font-semibold font-inter">
-                    Free
-                  </p>
-                )}
-
-                <div className="flex items-center justify-center bg-gray-300 px-2 rounded-full">
-                  <p className="text-gray-600 font-semibold font-inter text-sm">
-                    {event.category}
+                  <div className="flex gap-2 mt-3 items-center">
+                    <div>
+                      <Image
+                        src={calenderIcon}
+                        alt=""
+                        width={30}
+                        height={100}
+                      />
+                    </div>
+                    <div>
+                      <p>{event.location}</p>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h1 className="font-inter font-bold text-gray-500">
+                    What You'll Learn:
+                  </h1>
+                  <p className="font-montserrat">
+                    Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                    Rem, nulla. Deleniti architecto consequatur ullam mollitia
+                    perspiciatis, quaerat corrupti, sit enim obcaecati quisquam
+                    eum animi, magni reiciendis odio. Ex, consectetur pariatur!
                   </p>
                 </div>
                 <div>
-                  <p className="font-montserrat text-sm font-semibold">
-                    by{" "}
-                    <span className="text-violet-600 font-inter">
-                      {event.organizer.name}
-                    </span>
-                  </p>
+                  <Link className="text-violet-600 underline" href={event.url}>
+                    {event.url}
+                  </Link>
                 </div>
-              </div>
-              <div>
-                {event.price !== "" && (
-                  <Button
-                    onClick={handleCheckout}
-                    disabled={hasPurchased}
-                    className={`w-30 rounded-full h-10 font-inter ${
-                      hasPurchased
-                        ? "bg-green-500 cursor-not-allowed"
-                        : "bg-violet-600 hover:bg-violet-700 cursor-pointer"
-                    }`}
-                  >
-                    {hasPurchased ? "Purchased" : "Get Ticket"}
-                  </Button>
-                )}
-              </div>
-              {/* Event Date and Location */}
-              <div>
-                <div className="flex gap-2 items-center">
-                  <div>
-                    <Image src={locationIcon} alt="" width={30} height={30} />
-                  </div>
-                  <div>
-                    <p>
-                      {formatDateTime(event.startDateTime)} /{" "}
-                      {formatDateTime(event.endDateTime)}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-3 items-center">
-                  <div>
-                    <Image src={calenderIcon} alt="" width={30} height={100} />
-                  </div>
-                  <div>
-                    <p>{event.location}</p>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h1 className="font-inter font-bold text-gray-500">
-                  What You'll Learn:
-                </h1>
-                <p className="font-montserrat">
-                  Lorem ipsum dolor sit, amet consectetur adipisicing elit. Rem,
-                  nulla. Deleniti architecto consequatur ullam mollitia
-                  perspiciatis, quaerat corrupti, sit enim obcaecati quisquam
-                  eum animi, magni reiciendis odio. Ex, consectetur pariatur!
-                </p>
-              </div>
-              <div>
-                <Link className="text-violet-600 underline" href={event.url}>
-                  {event.url}
-                </Link>
               </div>
             </div>
           </div>
-        </div>
+          <div>
+            <RelatedEvents allEvents={relatedEvents} />
+          </div>
+        </>
       ) : (
         <div className="flex justify-center items-center w-full h-full">
-          <p>Loading...</p>
+          <Loader />
         </div>
       )}
       {/* Related Events Section */}
-      <div>
-        {/* {isRelatedEventsLoading ? (
-          <div className="flex justify-center items-center w-full h-full">
-            <p>Loading...</p>
-          </div>
-        ) : (
-          <RelatedEvents allEvents={relatedEvents} />
-        )} */}
-        <RelatedEvents allEvents={relatedEvents} />
-      </div>
     </section>
   );
 };

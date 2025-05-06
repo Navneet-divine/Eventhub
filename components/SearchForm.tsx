@@ -1,21 +1,25 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import searchIcon from "@/public/icons/search.svg";
 
 const formSchema = z.object({
-  title: z.string().min(1, "title is required"),
+  title: z.string().optional(),
 });
 
 const SearchForm: React.FC<{ onSearch: (query: string) => void }> = ({
   onSearch,
 }) => {
+  const [inputValue, setInputValue] = useState("");
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -23,19 +27,18 @@ const SearchForm: React.FC<{ onSearch: (query: string) => void }> = ({
     },
   });
 
-  const [searchQuery, setSearchQuery] = useState("");
-
+  // Handle debounced search
   useEffect(() => {
-    const handler = setTimeout(() => {
-      onSearch(searchQuery);
-    }, 200);
+    const timer = setTimeout(() => {
+      onSearch(inputValue);
+    }, 500);
 
-    return () => clearTimeout(handler);
-  }, [searchQuery, onSearch]);
+    return () => clearTimeout(timer);
+  }, [inputValue, onSearch]);
 
   return (
     <Form {...form}>
-      <form>
+      <form onSubmit={(e) => e.preventDefault()}>
         <FormField
           control={form.control}
           name="title"
@@ -44,7 +47,7 @@ const SearchForm: React.FC<{ onSearch: (query: string) => void }> = ({
               <FormControl>
                 <div className="relative">
                   <Image
-                    src={searchIcon}
+                    src={searchIcon || "/placeholder.svg"}
                     alt="Search"
                     width={20}
                     height={20}
@@ -52,12 +55,12 @@ const SearchForm: React.FC<{ onSearch: (query: string) => void }> = ({
                   />
                   <Input
                     placeholder="Search event..."
-                    {...field}
+                    className="pl-12 shadow-none"
+                    value={field.value}
                     onChange={(e) => {
                       field.onChange(e);
-                      setSearchQuery(e.target.value);
+                      setInputValue(e.target.value);
                     }}
-                    className="pl-12 shadow-none"
                   />
                 </div>
               </FormControl>

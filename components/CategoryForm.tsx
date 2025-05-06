@@ -1,14 +1,15 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import type React from "react";
+
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import Dropdown from "@/app/(root)/events/components/Dropdown";
 
 const schema = z.object({
-  category: z.string().min(1, "Please select a category"),
+  category: z.string().optional(),
 });
 
 type CategoryFormProps = {
@@ -32,14 +33,17 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ onCategoryChange }) => {
           render={({ field }) => (
             <FormItem className="w-full">
               <FormControl>
-                <Dropdown
-                  onChangeHandler={(value) => {
-                    field.onChange(value);
-                    onCategoryChange(value);
-                  }}
-                  value={field.value}
-                  hideAddCategory={true}
-                />
+                <div className="relative">
+                  <Dropdown
+                    hideAllCategory={true}
+                    onChangeHandler={(value) => {
+                      field.onChange(value);
+                      onCategoryChange(value);
+                    }}
+                    value={field.value}
+                    hideAddCategory={true}
+                  />
+                </div>
               </FormControl>
             </FormItem>
           )}

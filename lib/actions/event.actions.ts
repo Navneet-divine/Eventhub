@@ -113,42 +113,40 @@ export async function getEventById(eventId: string) {
     }
 }
 
-export async function getAllEvent(limit = 8, query = "", category = "") {
+export async function getAllEvent(limit = 9, query = "", category = "", page = 1) {
     try {
-        await connectToDB();
+        await connectToDB()
 
+        const searchQuery = query.trim() ? { title: { $regex: query.trim(), $options: "i" } } : {}
 
-        const searchQuery = query.trim()
-            ? { title: { $regex: query.trim(), $options: "i" } }
-            : {};
+        let categoryFilter = category ? { category: category } : {}
+        if (category === "all") {
+            categoryFilter = {}
+        }
 
-        const categoryFilter = category ? { category: category } : {};
+        const filter = { ...searchQuery, ...categoryFilter }
 
-        const filter = { ...searchQuery, ...categoryFilter };
-
-
-        const events = await Event.find(filter)
+        let events = await Event.find(filter)
             .populate("organizer")
             .sort({ createdAt: "desc" })
-            .limit(limit);
+            .skip((page - 1) * limit)
+            .limit(limit)
 
-        const eventCount = await Event.countDocuments(filter);
-
-        if (!events) {
-            throw new Error("Error fetching events");
-        }
+        const eventCount = await Event.countDocuments(filter)
 
         return {
             data: JSON.parse(JSON.stringify(events)),
             totalPages: Math.ceil(eventCount / limit),
             success: true,
-        };
+        }
     } catch (error) {
-        console.error("Error in getAllEvent:", error);
+        console.error("Error in getAllEvent:", error)
         return {
             success: false,
             error: error instanceof Error ? error.message : "Something went wrong",
-        };
+            data: [],
+            totalPages: 0,
+        }
     }
 }
 
@@ -222,12 +220,12 @@ export async function deleteEvent(eventId: string) {
     try {
         await connectToDB()
         const event = await Event.findByIdAndDelete(eventId)
+        revalidatePath("/home")
 
         if (!event) {
             throw new Error("Event does not exist")
         }
 
-        revalidatePath("/home")
         return JSON.parse(JSON.stringify(event))
 
     } catch (error) {
@@ -241,8 +239,10 @@ export async function deleteEvent(eventId: string) {
 
 export async function getRelatedEvent(eventId: string) {
     try {
+
         await connectToDB();
         const event = await Event.findById(eventId);
+
         if (!event) {
             throw new Error("Event does not exist");
         }
@@ -262,6 +262,17 @@ export async function getRelatedEvent(eventId: string) {
             relatedEvent = [];
         } else if (event.price === "" && event.isFree === false) {
             relatedEvent = await Event.find({ isFree: true, _id: { $ne: eventId } });
+        } else if ((!event.price || Number(event.price) === 0) && event.isFree === false) {
+            relatedEvent = await Event.find({
+                _id: { $ne: eventId },
+                isFree: false,
+                $or: [
+                    { price: "" },
+                    { price: null },
+                    { price: { $exists: false } }
+                ]
+            });
+
         }
 
 

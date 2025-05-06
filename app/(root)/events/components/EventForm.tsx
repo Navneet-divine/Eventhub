@@ -86,6 +86,7 @@ const EventForm: React.FC = () => {
   };
 
   const onSubmit = async (values: FormData) => {
+    console.log(values)
     try {
       setIsSubmitting(true);
 
@@ -160,6 +161,7 @@ const EventForm: React.FC = () => {
                       onChangeHandler={field.onChange}
                       value={field.value}
                       hideAddCategory={false}
+                      hideAllCategory={false}
                     />
                   </FormControl>
                   <FormMessage />

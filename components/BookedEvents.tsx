@@ -6,36 +6,38 @@ import { getUserBookedEvents, getUserEvents } from "@/lib/actions/user.actions";
 import ProfileCard from "@/components/ProfileCard";
 import notFound from "@/public/images/no-data .webp";
 import Image from "next/image";
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  location: string;
-  organizer: string;
-  category: string;
-  startDateTime: Date;
-  endDateTime: Date;
-  url: string;
-  isFree: boolean;
-}
+import Link from "next/link";
+import Loader from "./Loader";
 
 const BookedEvents: React.FC = () => {
   const { data: session, status } = useSession();
+  interface Event {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    imageUrl: string;
+    location: string;
+    organizer: string;
+    category: string;
+    startDateTime: Date;
+    endDateTime: Date;
+    url: string;
+    isFree: boolean;
+  }
 
   const [events, setEvents] = useState<Event[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
+  const [hasTriedLoadingMore, setHasTriedLoadingMore] = useState(false);
 
   const fetchUserEvents = async (pageNum = 1) => {
     if (!session?.user?.email) return;
 
     try {
       setLoading(true);
-      const res = await getUserBookedEvents(session.user.email, pageNum, 8);
+      const res = await getUserBookedEvents(session.user.email, pageNum, 9);
       if (res) {
         if (pageNum === 1) {
           setEvents(res.events);
@@ -60,11 +62,11 @@ const BookedEvents: React.FC = () => {
   const handleLoadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
+    setHasTriedLoadingMore(true);
     fetchUserEvents(nextPage);
   };
 
-  if (loading && events.length === 0)
-    return <p className="px-5 pt-10">Loading...</p>;
+  if (loading && events.length === 0) return <Loader />;
 
   return (
     <div>
@@ -82,6 +84,11 @@ const BookedEvents: React.FC = () => {
               </button>
             </div>
           )}
+          {!hasMore && hasTriedLoadingMore && (
+            <p className="text-center mt-4 text-sm text-gray-500">
+              No more events to load
+            </p>
+          )}
         </>
       ) : (
         <div className="w-full flex flex-col items-center justify-center">
@@ -95,7 +102,7 @@ const BookedEvents: React.FC = () => {
           </div>
           <div>
             <h1 className="text-2xl font-montserrat font-semibold text-center mt-3">
-              No Booked events found.
+              No booked events found
             </h1>
           </div>
         </div>
