@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { getAllEvent } from "@/lib/actions/event.actions";
+import { deleteEvent, getAllEvent } from "@/lib/actions/event.actions";
 import Card from "@/components/Card";
 import SearchForm from "./SearchForm";
 import CategoryForm from "./CategoryForm";
@@ -28,12 +28,14 @@ interface CollectionProps {
 }
 
 const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
+  const [isDeleted, setIsDeleted] = useState(false)
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [events, setEvents] = useState(allEvents);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+
 
   // Use refs to track the current state values for async operations
   const pageRef = useRef(page);
@@ -78,7 +80,7 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [isDeleted]);
 
   useEffect(() => {
     if (page !== 1) {
@@ -113,6 +115,10 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
       setPage(page - 1);
     }
   };
+
+   const handleDelete = async (eventId: string) => {
+      await deleteEvent(eventId);
+    };
 
   return (
     <div className={`px-5 lg:px-28 xl:px-40 pt-8 ${className}`}>
@@ -152,6 +158,7 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
                 startDateTime={event.startDateTime}
                 organizer={event.organizer.name}
                 showEditDelete={session?.user?.email === event.organizer.email}
+                onDelete={handleDelete}
               />
             ))
           ) : (

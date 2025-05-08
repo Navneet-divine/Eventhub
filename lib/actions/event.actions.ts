@@ -220,7 +220,7 @@ export async function deleteEvent(eventId: string) {
     try {
         await connectToDB()
         const event = await Event.findByIdAndDelete(eventId)
-        revalidatePath("/home")
+       revalidatePath("/home")
 
         if (!event) {
             throw new Error("Event does not exist")
@@ -274,7 +274,6 @@ export async function getRelatedEvent(eventId: string) {
             });
 
         }
-
 
         return JSON.parse(JSON.stringify(relatedEvent));
     } catch (error) {

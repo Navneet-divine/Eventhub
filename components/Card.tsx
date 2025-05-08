@@ -32,6 +32,7 @@ interface CardProps {
   startDateTime: string;
   organizer: string;
   showEditDelete?: boolean;
+  onDelete: (eventId: string) => void;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -43,11 +44,8 @@ const Card: React.FC<CardProps> = ({
   startDateTime,
   organizer,
   showEditDelete,
+  onDelete,
 }) => {
-  const handleDelete = async (eventId: string) => {
-    await deleteEvent(eventId);
-  };
-
   return (
     <div className="flex min-h-[300px] w-full rounded-t-lg border flex-col justify-between bg-white">
       {/* Event Image with Link */}
@@ -95,8 +93,13 @@ const Card: React.FC<CardProps> = ({
                   </AlertDialogTitle>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleDelete(eventId)}>
+                  <AlertDialogCancel className="cursor-pointer">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    className="cursor-pointer"
+                    onClick={() => onDelete(eventId)}
+                  >
                     Continue
                   </AlertDialogAction>
                 </AlertDialogFooter>

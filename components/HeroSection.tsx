@@ -19,11 +19,13 @@ const HeroSection: React.FC = () => {
             </p>
           </div>
           <div className="flex max-sm:justify-center py-5">
-            <Link href="/sign-in">
-              <Button className="w-full min-[510px]:w-40 sm:w-40 rounded-full h-12 bg-violet-600 font-inter hover:bg-violet-600 cursor-pointer">
-                Explore now
-              </Button>
-            </Link>
+            <div className="w-full">
+              <Link href="/sign-in">
+                <Button className="w-full min-[510px]:w-40 sm:w-40 rounded-full h-12 bg-violet-600 font-inter hover:bg-violet-600 cursor-pointer">
+                  Explore now
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
         <div className="sm:w-1/2 flex justify-center md:hidden ">
