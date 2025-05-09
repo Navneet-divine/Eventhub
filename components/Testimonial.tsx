@@ -96,8 +96,9 @@ const Testimonial: React.FC = () => {
               meetups because I love interacting with different people and I've
               been thinking about hosting my own meetup. So I went to eventhub
               to host a meetup and I was SHOCKED! after seeing how easy it was
-              to host a meetup on this platform. Thanks @eventhub for making
-              this platform.
+              to host a meetup on this platform. Thanks{" "}
+              <span className="text-violet-500">@eventhub</span> for making this
+              platform.
             </p>
           </div>
         )}
@@ -109,9 +110,10 @@ const Testimonial: React.FC = () => {
             <p className="text-gray-600 font-inter">
               As a software engineer, I always wanted to meet other developers
               to increase my knowledge and to grow my career. This was not easy.
-              After finding out about eventhub, I was super happy because there
-              were a lot of tech meetups. Meeting other developers outside my
-              company became super easy and simple.
+              After finding out about{" "}
+              <span className="text-violet-500">@eventhub</span>, I was super
+              happy because there were a lot of tech meetups. Meeting other
+              developers outside my company became super easy and simple.
             </p>
           </div>
         )}
@@ -123,10 +125,10 @@ const Testimonial: React.FC = () => {
             <p className="text-gray-600 font-inter">
               I was exhausted from work and wanted to take a break, so my friend
               told me about meetups and how great they are. So I decided to go
-              to eventhub, and guess what? Now I love going to nearby events,
-              which I almost always find on eventhub. Taking a break to attend
-              an eventhub was a great idea — everyone should try it at least
-              once.
+              to <span className="text-violet-500">@eventhub</span>, and guess
+              what? Now I love going to nearby events, which I almost always
+              find on eventhub. Taking a break to attend an eventhub was a great
+              idea — everyone should try it at least once.
             </p>
           </div>
         )}

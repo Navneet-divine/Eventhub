@@ -26,6 +26,7 @@ import Link from "next/link";
 import { Eye } from "lucide-react";
 import { EyeOff } from "lucide-react";
 import { useState } from "react";
+import { MoveLeft } from "lucide-react";
 
 const formSchema = z.object({
   email: z
@@ -70,6 +71,8 @@ const SignIn = () => {
       }
     } catch (error) {
       alert("Error signing in. Please try again.");
+    } finally {
+      setIsClick(false);
     }
   }
 
@@ -77,7 +80,13 @@ const SignIn = () => {
     <div className="relative h-screen w-screen flex justify-center bg-violet-100">
       <div className="w-[90%] md:w-96  absolute top-20 bg-white rounded-xl shadow-lg flex flex-col p-5 ">
         <div>
-          <h1 className="text-xl font-bold font-montserrat">Sign In</h1>
+          <div className="flex justify-between items-center">
+            <h1 className="text-xl font-bold font-montserrat">Sign In</h1>
+            <Link href="/">
+              <MoveLeft className="text-gray-600" />
+            </Link>
+          </div>
+
           <p className="text-sm text-gray-500 font-inter ">
             to continue to Eventhub
           </p>

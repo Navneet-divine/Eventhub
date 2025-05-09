@@ -4,6 +4,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { MoveLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -83,7 +84,13 @@ const SignUp = () => {
     <div className="relative h-screen w-screen flex justify-center bg-violet-100">
       <div className="w-[90%] md:w-96  absolute top-20 bg-white rounded-xl shadow-lg flex flex-col p-5 ">
         <div>
-          <h1 className="text-xl font-bold font-montserrat ">Sign Up</h1>
+          <div className="flex justify-between items-center">
+            <h1 className="text-xl font-bold font-montserrat">Sign Up</h1>
+            <Link href="/">
+              <MoveLeft className="text-gray-600" />
+            </Link>
+          </div>
+
           <p className="text-sm text-gray-500 font-inter ">
             to continue to Eventhub
           </p>

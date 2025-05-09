@@ -13,7 +13,7 @@ const AboveFooter: React.FC = () => {
         </h1>
       </div>
       <div>
-        <Link href="/sign-up">
+        <Link href="/sign-in">
           <Button className="w-36 h-11 rounded-full sm:w-40 sm:h-12 bg-violet-600 hover:bg-violet-700 cursor-pointer font-montserrat font-semibold text-base sm:text-lg">
             Join now!
           </Button>

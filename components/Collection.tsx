@@ -27,15 +27,33 @@ interface CollectionProps {
   className?: string;
 }
 
-const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
-  const [isDeleted, setIsDeleted] = useState(false)
+const Collection: React.FC<CollectionProps> = ({
+  allEvents: initialEvents,
+  className,
+}) => {
+  const [isDeleted, setIsDeleted] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  const [events, setEvents] = useState(allEvents);
+  interface Event {
+    _id: string;
+    title: string;
+    description: string;
+    imageUrl: string;
+    date: string;
+    location: string;
+    price: number;
+    category: string;
+    startDateTime: string;
+    organizer: {
+      name: string;
+      email: string;
+    };
+  }
+
+  const [events, setEvents] = useState<Event[]>(initialEvents);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-
 
   // Use refs to track the current state values for async operations
   const pageRef = useRef(page);
@@ -116,9 +134,16 @@ const Collection: React.FC<CollectionProps> = ({ allEvents, className }) => {
     }
   };
 
-   const handleDelete = async (eventId: string) => {
-      await deleteEvent(eventId);
-    };
+  const handleDelete = async (eventId: string) => {
+    try {
+      await deleteEvent(eventId); // delete from database
+      setEvents((prevEvents) =>
+        prevEvents.filter((event) => event._id !== eventId)
+      ); // update UI
+    } catch (error) {
+      console.error("Failed to delete event:", error);
+    }
+  };
 
   return (
     <div className={`px-5 lg:px-28 xl:px-40 pt-8 ${className}`}>
