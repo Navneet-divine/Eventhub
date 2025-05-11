@@ -220,7 +220,7 @@ export async function deleteEvent(eventId: string) {
     try {
         await connectToDB()
         const event = await Event.findByIdAndDelete(eventId)
-       revalidatePath("/home")
+        revalidatePath("/home")
 
         if (!event) {
             throw new Error("Event does not exist")
@@ -326,6 +326,45 @@ export async function toggleBookEvent(eventId: string, email: string) {
         return { success: false, error: "Something went wrong" };
     }
 }
+
+export async function getMoreEvents() {
+    try {
+        connectToDB()
+        const event = await Event.find({}).populate("organizer")
+
+        if (!event) {
+            return { success: false, error: "Event not found" };
+        }
+
+        return JSON.parse(JSON.stringify(event))
+
+    } catch (error) {
+        if (error instanceof Error) {
+            return { success: false, error: error.message || "Something went wrong" };
+        }
+        return { success: false, error: "Something went wrong" };
+    }
+}
+export async function getEventByCategory(category: string) {
+    try {
+        connectToDB()
+        const event = await Event.find({ category }).populate("organizer")
+
+        if (!event) {
+            return { success: false, error: "Event not found" };
+        }
+
+        return JSON.parse(JSON.stringify(event))
+
+    } catch (error) {
+        if (error instanceof Error) {
+            return { success: false, error: error.message || "Something went wrong" };
+        }
+        return { success: false, error: "Something went wrong" };
+    }
+}
+
+
 
 
 

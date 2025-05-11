@@ -37,7 +37,6 @@ const MyEvent: React.FC = () => {
   }, [session?.user?.email]);
 
  
-
   return (
     <>
       <div className="px-5 lg:px-28 xl:px-40 pt-10 pb-10">

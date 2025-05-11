@@ -8,7 +8,6 @@ import { deleteEvent, getAllEvent } from "@/lib/actions/event.actions";
 import Card from "@/components/Card";
 import SearchForm from "./SearchForm";
 import CategoryForm from "./CategoryForm";
-import spinner from "@/public/icons/spinner.svg";
 import Loader from "./Loader";
 
 import {
