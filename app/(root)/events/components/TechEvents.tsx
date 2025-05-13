@@ -1,6 +1,5 @@
 "use client";
 
-import Card from "@/components/Card";
 import { getEventByCategory } from "@/lib/actions/event.actions";
 import { useEffect, useState } from "react";
 import TechEventCard from "./TechEventCard";
@@ -31,7 +30,6 @@ const AllEvents: React.FC = () => {
       try {
         setLoading(true);
         const res = await getEventByCategory("technology");
-        console.log("Fetched events:", res);
         if (Array.isArray(res)) {
           setAllEvents(res);
         } else {

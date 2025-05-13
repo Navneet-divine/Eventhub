@@ -51,8 +51,8 @@ const AllEvents: React.FC = () => {
   }
 
   return (
-    <div className="px-5 lg:px-28 xl:px-40 pt-5 pb-10">
-      <h1 className="text-4xl font-montserrat font-bold">
+    <div className="px-5 lg:px-28 xl:px-40 pt-5 pb-5">
+      <h1 className="text-3xl md:text-4xl font-montserrat font-bold">
         All Events that are
       </h1>
       <p className="text-gray-500 font-inter">recommended by eventhub</p>
@@ -75,7 +75,9 @@ const AllEvents: React.FC = () => {
           />
         ))}
       </div>
-      <div className="flex justify-center">No more events</div>
+      <div className="flex justify-center text-gray-600 text-lg font-montserrat mt-5">
+        No more events
+      </div>
     </div>
   );
 };

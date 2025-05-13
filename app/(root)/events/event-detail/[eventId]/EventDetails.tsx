@@ -34,6 +34,7 @@ interface Event {
   imageUrl: string;
   url: string;
   isBooked: boolean;
+  description: string;
 }
 
 const EventDetails = () => {
@@ -260,12 +261,7 @@ const EventDetails = () => {
                   <h1 className="font-inter font-bold text-gray-500">
                     What You'll Learn:
                   </h1>
-                  <p className="font-montserrat">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                    Rem, nulla. Deleniti architecto consequatur ullam mollitia
-                    perspiciatis, quaerat corrupti, sit enim obcaecati quisquam
-                    eum animi, magni reiciendis odio. Ex, consectetur pariatur!
-                  </p>
+                  <p className="font-montserrat">{event.description}</p>
                 </div>
                 <div>
                   <Link className="text-violet-600 underline" href={event.url}>

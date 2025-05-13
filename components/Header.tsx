@@ -4,17 +4,39 @@ import Image from "next/image";
 import Navigation from "./Navigation";
 import Link from "next/link";
 import { NAV_LINK } from "@/constants/index";
-
 import { Button } from "./ui/button";
 import { useSession } from "next-auth/react";
 import { MobileNav } from "./MobileNav";
 import { LogOut } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, signIn } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function Header() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const pathName = usePathname();
+  const [avatar, setAvatar] = useState<string | undefined>(
+    session?.user?.avatar
+  );
+
+  // Function to refresh the session after avatar change
+  const refreshSession = async () => {
+    try {
+      // Trigger a session refresh after the avatar update
+      await signIn("credentials", { force: true });
+    } catch (error) {
+      console.error("Error refreshing session", error);
+    }
+  };
+
+  // Update avatar when session or avatar changes
+  useEffect(() => {
+    if (session?.user?.avatar) {
+      setAvatar(session.user.avatar);
+    } else if (session?.user?.image) {
+      setAvatar(session.user.image);
+    }
+  }, [session?.user?.avatar, session?.user?.image]);
 
   return (
     <div className="flex justify-between items-center p-3 px-5 lg:px-28 xl:px-40 border border-r-gray-200">
@@ -50,7 +72,7 @@ export default function Header() {
       )}
 
       <div className="flex items-center justify-end h-full">
-        {session?.user.image && (
+        {session?.user?.image && (
           <div className="flex items-center justify-center space-x-2">
             <div
               onClick={() => signOut({ callbackUrl: "/" })}
@@ -58,46 +80,38 @@ export default function Header() {
             >
               <LogOut className="text-red-400" />
             </div>
-            <div className="rounded-full h-9 w-9 cursor-pointer overflow-hidden">
-              <Image
-                src={session.user.image}
-                alt="userAvatar"
-                width={36}
-                height={36}
-                className="rounded-full"
-              />
-            </div>
+            <Link href="/profile">
+              <div className="rounded-full h-9 w-9 cursor-pointer overflow-hidden">
+                <Image
+                  src={avatar ?? "/default-avatar.png"} 
+                  alt="userAvatar"
+                  width={36}
+                  height={36}
+                  className="rounded-full"
+                />
+              </div>
+            </Link>
           </div>
         )}
 
-        {session &&
-          !session.user.image &&
-          (session?.user.avatar ? (
-            <div className="rounded-full h-9 mr-2 shrink-0 w-9 cursor-pointer">
-              <Image
-                src={session.user.avatar}
-                alt="userAvatar"
-                width={100}
-                height={100}
-                className="rounded-full h-9 w-9 object-fill"
-              />
+        {session && !session.user.image && (
+          <>
+            <div
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="rounded-full h-9 w-9 cursor-pointer flex items-center justify-center"
+            >
+              <LogOut className="text-red-400" />
             </div>
-          ) : (
-            <>
-              <div
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="rounded-full h-9 w-9 cursor-pointer flex items-center justify-center"
-              >
-                <LogOut className="text-red-400" />
-              </div>
+            <Link href="/profile">
               <div
                 className="flex justify-center items-center rounded-full h-9 mr-2 shrink-0 w-9 text-white font-montserrat cursor-pointer"
                 style={{ backgroundColor: session.user.color }}
               >
                 {session.user.name?.charAt(0).toUpperCase()}
               </div>
-            </>
-          ))}
+            </Link>
+          </>
+        )}
 
         {session && (
           <div className="sm:hidden">

@@ -16,11 +16,12 @@ const Dashboard: React.FC = async () => {
   const allEvents = await getAllEvent();
 
   return (
-    <div className="pb-10">
+    <div className="">
       <HeroSection />
+      <TechEventsPage />
       <Collection allEvents={allEvents.data} />
-      <TechEventsPage/>
-      <section className="flex mt-10 flex-col w-full p-10 px-5 md:p-16 md:px-20 bg-gradient-to-r from-purple-800 to-violet-400 text-white">
+
+      <section className="flex mt-5 flex-col w-full p-10 px-5 md:p-16 md:px-20 bg-gradient-to-r from-purple-800 to-violet-400 text-white">
         <div>
           <h1 className="text-2xl md:text-4xl font-bold font-inter">
             Interested in more events?

@@ -7,8 +7,6 @@ import GoogleProvider from "next-auth/providers/google";
 import { connectToDB } from "@/lib/db";
 import { compare } from "bcryptjs";
 
-
-
 export const authOptions: NextAuthOptions = {
     providers: [
         GoogleProvider({
@@ -49,7 +47,8 @@ export const authOptions: NextAuthOptions = {
                         name: user.name,
                         email: user.email,
                         avatar: user.avatar,
-                        color: user.color
+                        color: user.color,
+
                     }
                 } catch (error) {
                     console.log(error)
@@ -67,6 +66,7 @@ export const authOptions: NextAuthOptions = {
                 token.email = user.email;
                 token.avatar = (user as any).avatar;
                 token.color = (user as any).color;
+
             }
             return token;
         },
@@ -77,6 +77,7 @@ export const authOptions: NextAuthOptions = {
                 session.user.email = token.email;
                 session.user.avatar = token.avatar
                 session.user.color = token.color;
+
             }
             return session;
         }

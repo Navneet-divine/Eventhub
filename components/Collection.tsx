@@ -19,7 +19,6 @@ import {
   PaginationEllipsis,
   PaginationLink,
 } from "@/components/ui/pagination";
-import Image from "next/image";
 
 interface CollectionProps {
   allEvents: any;
@@ -54,12 +53,10 @@ const Collection: React.FC<CollectionProps> = ({
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Use refs to track the current state values for async operations
   const pageRef = useRef(page);
   const searchRef = useRef(search);
   const categoryRef = useRef(category);
 
-  // Update refs when state changes
   useEffect(() => {
     pageRef.current = page;
     searchRef.current = search;
@@ -68,11 +65,9 @@ const Collection: React.FC<CollectionProps> = ({
 
   const { data: session } = useSession();
 
-  // Memoize the fetch function to prevent recreating it on every render
   const fetchEvents = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Use the ref values to ensure we're using the latest state
       const res = await getAllEvent(
         9,
         searchRef.current,
@@ -214,7 +209,7 @@ const Collection: React.FC<CollectionProps> = ({
 
                 {/* Show a few page numbers */}
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter((pageNum) => Math.abs(pageNum - page) <= 2) // Only show near current
+                  .filter((pageNum) => Math.abs(pageNum - page) <= 2)
                   .map((pageNum) => (
                     <PaginationItem key={pageNum}>
                       <PaginationLink

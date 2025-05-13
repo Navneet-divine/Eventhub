@@ -22,18 +22,16 @@ const TechEventCard: React.FC<TechEventCardProps> = ({
   return (
     <Link href={`/events/event-detail/${eventId}`}>
       <div className="flex gap-5 p-2 w-full items-start cursor-pointer">
-        {/* Image */}
-        <div className="flex-shrink-0 w-32 h-14">
+        <div className="flex-shrink-0 w-32 h-16">
           <Image
             src={image}
             alt="Event"
             width={100}
             height={100}
-            className="w-32 h-20 object-cover"
+            className="w-32 h-16 object-cover"
           />
         </div>
 
-        {/* Content */}
         <div className="flex flex-col justify-between w-full">
           <h1 className="text-lg font-semibold">{title}</h1>
           <p className="text-gray-500 text-sm">{formatDateTime(startDate)}</p>

@@ -9,8 +9,16 @@ interface User {
     createdAt?: Date;
     updatedAt?: Date;
     color: string
-    events: string[]; // Array of event IDs
+    events: string[];
     bookedEvents: string[]
+    phoneNo: string
+    socials: {
+        instagram?: string;
+        facebook?: string;
+        twitter?: string;
+        linkedIn?: string;
+    };
+
 }
 
 const userSchema = new Schema<User>({
@@ -27,7 +35,7 @@ const userSchema = new Schema<User>({
         type: String,
     },
     color: {
-        type: String, // We'll st
+        type: String,
     },
     password: {
         type: String,
@@ -43,7 +51,17 @@ const userSchema = new Schema<User>({
             type: Schema.Types.ObjectId,
             ref: "Event"
         }
-    ]
+    ],
+    phoneNo: {
+        type: String
+    },
+    socials: {
+        instagram: String,
+        facebook: String,
+        twitter: String,
+        linkedIn: String
+
+    }
 }, {
     timestamps: true,
 });
