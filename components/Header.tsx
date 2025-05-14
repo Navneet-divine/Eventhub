@@ -42,7 +42,7 @@ export default function Header() {
     <div className="flex justify-between items-center p-3 px-5 lg:px-28 xl:px-40 border border-r-gray-200">
       <div>
         <div className="flex items-center">
-          <Image src={logo} alt="logo" width={35} height={35} />
+          <Image src="/icons/logo.png" alt="logo" width={35} height={35} />
           <h1 className="text-xl font-bold ml-2 font-montserrat">Eventhub</h1>
         </div>
       </div>
