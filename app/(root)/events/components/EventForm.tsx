@@ -61,7 +61,7 @@ const EventForm: React.FC = () => {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
-      form.setValue("imageUrl", "image-will-be-uploaded" as any);
+      form.setValue("imageUrl", "image-will-be-uploaded");
     }
   };
 
@@ -72,7 +72,7 @@ const EventForm: React.FC = () => {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
-      form.setValue("imageUrl", "image-will-be-uploaded" as any);
+      form.setValue("imageUrl", "image-will-be-uploaded");
     }
   };
 
@@ -194,7 +194,7 @@ const EventForm: React.FC = () => {
               <FormField
                 control={form.control}
                 name="imageUrl"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <div
                       onClick={handleUploadFile}

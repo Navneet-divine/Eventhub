@@ -1,7 +1,6 @@
 import HeroSection from "@/components/HeroSection";
 import Collection from "@/components/Collection";
 import { getAllEvent } from "@/lib/actions/event.actions";
-import { signOut } from "next-auth/react";
 
 import { Metadata } from "next";
 import { Button } from "@/components/ui/button";

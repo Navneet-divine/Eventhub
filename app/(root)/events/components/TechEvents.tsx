@@ -50,7 +50,7 @@ const AllEvents: React.FC = () => {
   return (
     <div className="px-5 lg:px-28 xl:px-40 pt-5 pb-10">
       <h1 className="text-2xl md:text-3xl font-montserrat font-bold">
-        Evetns for <span className="text-violet-600">"Techy"</span> Peoples
+        Evetns for <span className="text-violet-600">&quot;Techy&quot;</span> Peoples
       </h1>
 
       {loading ? (

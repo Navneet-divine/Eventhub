@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -68,7 +67,7 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ event, eventId }) => {
     endDateTime: new Date(event.endDateTime),
   });
   const router = useRouter();
-  const { data: session } = useSession();
+
   const fileUpload = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
     event.imageUrl ?? null
@@ -102,7 +101,7 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ event, eventId }) => {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
-      form.setValue("imageUrl", "image-will-be-uploaded" as any);
+      form.setValue("imageUrl", "image-will-be-uploaded");
     }
   };
 
@@ -113,7 +112,7 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ event, eventId }) => {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
-      form.setValue("imageUrl", "image-will-be-uploaded" as any);
+      form.setValue("imageUrl", "image-will-be-uploaded");
     }
   };
 
@@ -126,22 +125,24 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ event, eventId }) => {
     setIsDragging(false);
   };
 
-  const onSubmit = async (values: FormData) => {
+  const onSubmit = async () => {
     try {
       setIsSubmitting(true);
 
       const formData = new FormData();
 
-      // Add all form values to formData
       Object.entries(filedValue).forEach(([key, value]) => {
         if (key !== "imageUrl" && value !== undefined && value !== null) {
           if (key === "startDateTime" || key === "endDateTime") {
-            // Ensure we're passing Date objects to the server action
             formData.append(
               key,
               value instanceof Date
                 ? value.toISOString()
-                : new Date(value as any).toISOString()
+                : new Date(
+                    typeof value === "string" || typeof value === "number"
+                      ? value
+                      : ""
+                  ).toISOString()
             );
           } else {
             formData.append(key, String(value));
@@ -253,7 +254,7 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ event, eventId }) => {
               <FormField
                 control={form.control}
                 name="imageUrl"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <div
                       onClick={handleUploadFile}

@@ -16,7 +16,6 @@ const TechEventCard: React.FC<TechEventCardProps> = ({
   startDate,
   image,
   price,
-  isFree,
   eventId,
 }) => {
   return (

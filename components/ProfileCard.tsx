@@ -44,6 +44,10 @@ const ProfileCard: React.FC<EventDataProps> = ({ allEvents }) => {
               showEditDelete={
                 session?.user.email === event.organizer.email ? true : false
               }
+              onDelete={() => {
+                // Add your delete logic here
+                console.log(`Delete event with ID: ${event._id}`);
+              }}
             />
           ))}
         </div>

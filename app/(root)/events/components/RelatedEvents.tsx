@@ -12,7 +12,10 @@ interface EventDataProps {
     price: number;
     imageUrl: string;
     location: string;
-    organizer: string;
+    organizer: {
+      name: string;
+      email: string;
+    };
     category: string;
     startDateTime: Date;
     endDateTime: Date;
@@ -32,24 +35,24 @@ const RelatedEvents: React.FC<EventDataProps> = ({ allEvents }) => {
 
       {allEvents?.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5">
-          {allEvents.map((event: any, i: number) => (
+          {allEvents.map((event, i: number) => (
             <Card
               key={i}
-              eventId={event._id}
+              eventId={event.id}
               title={event.title}
               description={event.description}
               imageUrl={event.imageUrl}
-              date={event.date}
+              date={new Date(event.startDateTime).toISOString()}
               location={event.location}
               price={event.price}
               category={event.category}
-              startDateTime={event.startDateTime}
+              startDateTime={new Date(event.startDateTime).toISOString()}
               organizer={event.organizer.name}
               showEditDelete={
                 session?.user.email === event.organizer.email ? true : false
               }
               onDelete={() => {
-                console.log(`Delete event with ID: ${event._id}`);
+                console.log(`Delete event with ID: ${event.id}`);
               }}
             />
           ))}

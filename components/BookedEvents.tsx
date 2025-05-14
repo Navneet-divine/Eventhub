@@ -2,15 +2,14 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { getUserBookedEvents, getUserEvents } from "@/lib/actions/user.actions";
+import { getUserBookedEvents } from "@/lib/actions/user.actions";
 import ProfileCard from "@/components/ProfileCard";
 import notFound from "@/public/images/no-data .webp";
 import Image from "next/image";
-import Link from "next/link";
 import Loader from "./Loader";
 
 const BookedEvents: React.FC = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   interface Event {
     id: string;
     title: string;

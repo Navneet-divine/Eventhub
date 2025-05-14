@@ -72,11 +72,9 @@ const SignUp = () => {
       if (!response.ok) {
         throw new Error("Failed to register");
       }
-
-      const data = await response.json();
       router.push("/sign-in");
     } catch (error) {
-      alert("Something went wrong while registering.");
+      alert( error || "Something went wrong while registering.");
     }
   }
 

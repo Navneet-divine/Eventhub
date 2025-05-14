@@ -61,8 +61,12 @@ const Dropdown: React.FC<DropdownProps> = ({
         const updatedCategories = await getCategories();
         setCategories(updatedCategories);
       }
-    } catch (error: any) {
-      console.log(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log("Unknown error", error);
+      }
       setError("Something went wrong while creating the category");
     }
   }

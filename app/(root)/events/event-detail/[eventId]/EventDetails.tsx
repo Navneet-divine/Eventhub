@@ -41,10 +41,10 @@ const EventDetails = () => {
   const { data: session } = useSession();
   const params = useParams();
   const eventId = params?.eventId as string;
-  const [relatedEvents, setRelatedEvents] = useState<any>([]);
+  const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [event, setEvent] = useState<Event | null>(null);
   const [isBooked, setIsBooked] = useState<Boolean>();
-  const [isRelatedEventsLoading, setIsRelatedEventsLoading] = useState(true);
+
   const [hasPurchased, setHasPurchased] = useState(false);
 
   useEffect(() => {
@@ -77,8 +77,6 @@ const EventDetails = () => {
         setRelatedEvents(res);
       } catch (error) {
         console.error("Failed to fetch related events:", error);
-      } finally {
-        setIsRelatedEventsLoading(false);
       }
     };
 
@@ -135,12 +133,12 @@ const EventDetails = () => {
   async function handleToggleBookmark() {
     try {
       if (event) {
-        const res = await toggleBookEvent(event._id, session?.user.email);
+        await toggleBookEvent(event._id, session?.user.email);
         setIsBooked((prev) => !prev);
       } else {
         console.error("Event is null");
       }
-    } catch (error: any) {
+    } catch {
       alert("error");
     }
   }
@@ -208,7 +206,7 @@ const EventDetails = () => {
                   </div>
                   <div>
                     <p className="font-montserrat text-sm font-semibold">
-                      by{" "}
+                      by&nbsp;
                       <span className="text-violet-600 font-inter">
                         {event.organizer.name}
                       </span>
@@ -272,7 +270,22 @@ const EventDetails = () => {
             </div>
           </div>
           <div>
-            <RelatedEvents allEvents={relatedEvents} />
+            <RelatedEvents
+              allEvents={relatedEvents.map((event) => ({
+                id: event._id,
+                title: event.title,
+                description: event.description,
+                price: Number(event.price),
+                imageUrl: event.imageUrl,
+                location: event.location,
+                organizer: { name: event.organizer.name, email: "" },
+                category: event.category,
+                startDateTime: new Date(event.startDateTime),
+                endDateTime: new Date(event.endDateTime),
+                url: event.url,
+                isFree: Number(event.price) === 0,
+              }))}
+            />
           </div>
         </>
       ) : (
@@ -280,7 +293,6 @@ const EventDetails = () => {
           <Loader />
         </div>
       )}
-      {/* Related Events Section */}
     </section>
   );
 };

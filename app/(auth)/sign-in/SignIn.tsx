@@ -70,7 +70,7 @@ const SignIn = () => {
         toast.error("Invalid credentials.");
       }
     } catch (error) {
-      alert("Error signing in. Please try again.");
+      alert(error || "Error signing in. Please try again.");
     } finally {
       setIsClick(false);
     }
@@ -184,7 +184,7 @@ const SignIn = () => {
         </div>
         <div>
           <p className="text-sm text-gray-500 font-inter mt-4">
-            Don't have an account?
+            Don&apos;t have an account?
             <Link href="/sign-up">
               <span className="text-violet-600 cursor-pointer">Sign Up</span>
             </Link>
