@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
-import { editProfile, getUserByEmail } from "@/lib/actions/user.actions";
+import { editProfile} from "@/lib/actions/user.actions";
 import { useSession } from "next-auth/react";
 
 interface Props {

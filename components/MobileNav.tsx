@@ -10,7 +10,6 @@ import {
 import menuICon from "@/public/icons/menu.svg";
 import Image from "next/image";
 
-import logo from "@/public/icons/logo.png";
 import { NAV_LINK } from "@/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -59,7 +58,12 @@ export function MobileNav() {
         <SheetFooter>
           <div className="flex flex-col items-center gap-2">
             <div className="flex items-center">
-              <Image src="/icons/logo.png" alt="logo" width={35} height={35} />
+              <Image
+                src="/icons/logo.pnggi"
+                alt="logo"
+                width={35}
+                height={35}
+              />
               <h1 className="text-xl font-bold ml-2 font-montserrat">
                 Eventhub
               </h1>

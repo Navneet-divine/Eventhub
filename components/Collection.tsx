@@ -21,32 +21,32 @@ import {
 } from "@/components/ui/pagination";
 
 interface CollectionProps {
-  allEvents: any;
+  allEvents: Event[];
   className?: string;
+}
+
+interface Event {
+  _id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  date: string;
+  location: string;
+  price: number;
+  category: string;
+  startDateTime: string;
+  organizer: {
+    name: string;
+    email: string;
+  };
 }
 
 const Collection: React.FC<CollectionProps> = ({
   allEvents: initialEvents,
   className,
 }) => {
-  const [isDeleted, setIsDeleted] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  interface Event {
-    _id: string;
-    title: string;
-    description: string;
-    imageUrl: string;
-    date: string;
-    location: string;
-    price: number;
-    category: string;
-    startDateTime: string;
-    organizer: {
-      name: string;
-      email: string;
-    };
-  }
 
   const [events, setEvents] = useState<Event[]>(initialEvents);
   const [page, setPage] = useState(1);
@@ -92,7 +92,7 @@ const Collection: React.FC<CollectionProps> = ({
 
   useEffect(() => {
     fetchEvents();
-  }, [isDeleted]);
+  }, []);
 
   useEffect(() => {
     if (page !== 1) {
@@ -163,7 +163,7 @@ const Collection: React.FC<CollectionProps> = ({
               <Loader />
             </div>
           ) : events?.length > 0 ? (
-            events.map((event: any) => (
+            events.map((event: Event) => (
               <Card
                 key={event._id}
                 eventId={event._id}

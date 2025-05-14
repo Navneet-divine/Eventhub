@@ -43,7 +43,7 @@ const EventDetails = () => {
   const eventId = params?.eventId as string;
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [event, setEvent] = useState<Event | null>(null);
-  const [isBooked, setIsBooked] = useState<Boolean>();
+  const [isBooked, setIsBooked] = useState<boolean>();
 
   const [hasPurchased, setHasPurchased] = useState(false);
 
@@ -257,7 +257,7 @@ const EventDetails = () => {
                 </div>
                 <div>
                   <h1 className="font-inter font-bold text-gray-500">
-                    What You'll Learn:
+                    What You&apos;ll Learn:
                   </h1>
                   <p className="font-montserrat">{event.description}</p>
                 </div>

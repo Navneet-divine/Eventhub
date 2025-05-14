@@ -8,12 +8,6 @@ import BookedEvents from "@/components/BookedEvents";
 
 const MyEvent: React.FC = () => {
   const { data: session, status } = useSession();
-  const [events, setEvents] = useState<{
-    events: any;
-    hasMore: boolean;
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [hasTriedLoadingMore, setHasTriedLoadingMore] = useState(false);
 
   useEffect(() => {
     const fetchUserEvents = async () => {
@@ -22,21 +16,17 @@ const MyEvent: React.FC = () => {
       try {
         const res = await getUserEvents(session.user.email);
         if (res) {
-          setEvents({ events: res.events, hasMore: res.hasMore ?? false });
         } else {
           console.error("Failed to fetch user events");
         }
       } catch (err) {
         console.error("Error fetching user events:", err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchUserEvents();
   }, [session?.user?.email]);
 
- 
   return (
     <>
       <div className="px-5 lg:px-28 xl:px-40 pt-10 pb-10">

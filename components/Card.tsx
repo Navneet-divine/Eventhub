@@ -6,7 +6,7 @@ import Link from "next/link";
 import { formatDateTime } from "@/utils/formatDate";
 import editIcon from "@/public/icons/edit.svg";
 import deleteIcon from "@/public/icons/delete.svg";
-import { deleteEvent } from "@/lib/actions/event.actions";
+
 
 import {
   AlertDialog,

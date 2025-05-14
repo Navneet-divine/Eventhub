@@ -1,5 +1,5 @@
 "use client";
-import logo from "@/public/icons/logo.png";
+
 import Image from "next/image";
 import Navigation from "./Navigation";
 import Link from "next/link";
@@ -13,23 +13,12 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export default function Header() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const pathName = usePathname();
   const [avatar, setAvatar] = useState<string | undefined>(
     session?.user?.avatar
   );
 
-  // Function to refresh the session after avatar change
-  const refreshSession = async () => {
-    try {
-      // Trigger a session refresh after the avatar update
-      await signIn("credentials", { force: true });
-    } catch (error) {
-      console.error("Error refreshing session", error);
-    }
-  };
-
-  // Update avatar when session or avatar changes
   useEffect(() => {
     if (session?.user?.avatar) {
       setAvatar(session.user.avatar);
@@ -83,7 +72,7 @@ export default function Header() {
             <Link href="/profile">
               <div className="rounded-full h-9 w-9 cursor-pointer overflow-hidden">
                 <Image
-                  src={avatar ?? "/default-avatar.png"} 
+                  src={avatar ?? "/default-avatar.png"}
                   alt="userAvatar"
                   width={36}
                   height={36}

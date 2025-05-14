@@ -10,7 +10,7 @@ import Link from "next/link";
 import Loader from "./Loader";
 
 const MyEvents: React.FC = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   interface Event {
     id: string;
     title: string;
