@@ -48,6 +48,9 @@ const RelatedEvents: React.FC<EventDataProps> = ({ allEvents }) => {
               showEditDelete={
                 session?.user.email === event.organizer.email ? true : false
               }
+              onDelete={() => {
+                console.log(`Delete event with ID: ${event._id}`);
+              }}
             />
           ))}
         </div>

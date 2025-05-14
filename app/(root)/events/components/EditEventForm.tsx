@@ -211,6 +211,8 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ event, eventId }) => {
                     <Dropdown
                       onChangeHandler={field.onChange}
                       value={filedValue.category}
+                      hideAddCategory={false}
+                      hideAllCategory={false}
                     />
                   </FormControl>
                   <FormMessage />

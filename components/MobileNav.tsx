@@ -32,7 +32,7 @@ export function MobileNav() {
         <SheetHeader>
           <SheetTitle>
             <div className="flex items-center">
-              <Image src={logo.src} alt="logo" width={35} height={35} />
+              <Image src={logo} alt="logo" width={35} height={35} />
               <h1 className="text-xl font-bold ml-2 font-montserrat">
                 Eventhub
               </h1>
