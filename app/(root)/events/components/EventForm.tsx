@@ -110,7 +110,23 @@ const EventForm: React.FC = () => {
         console.log(pair[0], pair[1]);
       }
 
-      const result = await createEvent(formData, session?.user);
+      if (!session?.user) {
+        console.error("User session is not available");
+        return;
+      }
+      if (!session?.user?.name || !session.user.email) {
+        console.error("User session is missing required fields");
+        return;
+      }
+
+      const userData = {
+        id: session.user.id,
+        name: session.user.name,
+        email: session.user.email,
+        image: session.user.image || "",
+      };
+
+      const result = await createEvent(formData, userData);
       console.log(result);
 
       if (result.success === false) {
