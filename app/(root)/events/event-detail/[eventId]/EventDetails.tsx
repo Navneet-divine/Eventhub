@@ -133,7 +133,11 @@ const EventDetails = () => {
   async function handleToggleBookmark() {
     try {
       if (event) {
-        await toggleBookEvent(event._id, session?.user.email);
+        if (session?.user.email) {
+          await toggleBookEvent(event._id, session.user.email);
+        } else {
+          console.error("User email is undefined or null");
+        }
         setIsBooked((prev) => !prev);
       } else {
         console.error("Event is null");
