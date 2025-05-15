@@ -67,7 +67,6 @@ const EventDetails = () => {
     fetchEvent();
   }, [eventId]);
 
-  // Fetch related events
   useEffect(() => {
     if (!eventId) return;
 
@@ -83,7 +82,6 @@ const EventDetails = () => {
     fetchAllEvents();
   }, [eventId]);
 
-  // Handle Stripe checkout
   const handleCheckout = async () => {
     const stripe: Stripe | null = await loadStripe(
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
