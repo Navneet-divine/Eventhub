@@ -42,10 +42,13 @@ export async function createEvent(formData: FormData, userdata: UserData) {
         }
 
 
-        const eventData: Record<string, any> = {}
+        interface EventData {
+            [key: string]: string | number | boolean | undefined;
+        }
+        const eventData: EventData = {}
         for (const [key, value] of formData.entries()) {
             if (key !== "imageUrl") {
-                eventData[key] = value
+                eventData[key] = typeof value === "string" ? value : undefined
             }
         }
 
@@ -166,10 +169,9 @@ export async function editEvent(eventId: string, formData: FormData) {
             console.log(`${key}: ${typeof value === "object" ? "File object" : value}`)
         }
 
-        // Find the event to be edited
         const event = await Event.findById(eventId)
         if (!event) {
-            throw new Error("Event does not exist")
+            return { success: false, error: "Event not found." };
         }
 
         const eventData: Record<string, any> = {}
@@ -251,9 +253,9 @@ export async function getRelatedEvent(eventId: string) {
         const event = await Event.findById(eventId);
 
         if (!event) {
-            throw new Error("Event does not exist");
+            return { success: false, error: "Event not found." };
         }
-        let relatedEvent: any[] = [];
+        let relatedEvent: typeof Event[] = [];
 
         if (event.isFree) {
             relatedEvent = await Event.find({ isFree: true, _id: { $ne: eventId } });

@@ -59,13 +59,13 @@ export const authOptions: NextAuthOptions = {
     ],
 
     callbacks: {
-        async jwt({ token, user }: { token: any; user?: any }) {
+        async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
                 token.name = user.name;
                 token.email = user.email;
-                token.avatar = user.avatar as string;
-                token.color = user.color as string;
+                token.avatar = (user as any).avatar;
+                token.color = (user as any).color;
 
             }
             return token;
