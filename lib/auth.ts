@@ -64,8 +64,8 @@ export const authOptions: NextAuthOptions = {
                 token.id = user.id;
                 token.name = user.name;
                 token.email = user.email;
-                token.avatar = (user as any).avatar;
-                token.color = (user as any).color;
+                token.avatar = user.avatar;
+                token.color = user.color;
 
             }
             return token;

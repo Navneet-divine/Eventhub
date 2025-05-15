@@ -174,12 +174,12 @@ export async function editEvent(eventId: string, formData: FormData) {
             return { success: false, error: "Event not found." };
         }
 
-        const eventData: Record<string, any> = {}
+        const eventData: Record<string, string | number | boolean | undefined> = {}
 
         // Process FormData
         for (const [key, value] of formData.entries()) {
             if (key !== "imageUrl") {
-                eventData[key] = value
+                eventData[key] = typeof value === "string" ? value : undefined
             }
         }
 
