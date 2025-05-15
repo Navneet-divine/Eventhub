@@ -9,9 +9,10 @@ import { useEffect, useState, useTransition } from "react";
 
 const SocialsForm: React.FC = () => {
   const { data: session } = useSession();
-  const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState("");
-  const [user, setUser] = useState<any>(null);
+  const [isPending, startTransition] = useTransition() as [
+    boolean,
+    (callback: () => void) => void
+  ];
 
   const [form, setForm] = useState({
     instagram: "",
@@ -29,7 +30,6 @@ const SocialsForm: React.FC = () => {
     if (!session?.user?.email) return;
     try {
       const res = await getUserByEmail(session.user.email);
-      setUser(res);
 
       // Pre-fill form with existing data
       if (res?.socials) {
@@ -53,7 +53,6 @@ const SocialsForm: React.FC = () => {
     e.preventDefault();
 
     if (!session?.user?.email) {
-      setMessage("You must be logged in.");
       return;
     }
 
@@ -66,10 +65,7 @@ const SocialsForm: React.FC = () => {
     startTransition(async () => {
       const result = await updateSocials(session.user.email, formData);
       if (result.success) {
-        setMessage("Socials updated successfully!");
         window.location.reload();
-      } else {
-        setMessage(`Error: ${result.error}`);
       }
     });
   }

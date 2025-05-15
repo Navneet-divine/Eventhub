@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 import { useSession } from "next-auth/react";
 import { MobileNav } from "./MobileNav";
 import { LogOut } from "lucide-react";
-import { signOut, signIn } from "next-auth/react";
+import { signOut} from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 

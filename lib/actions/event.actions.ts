@@ -7,7 +7,14 @@ import { generateColor } from "@/utils/generateColor"
 import cloudinary from "../cloudinary"
 import { revalidatePath } from "next/cache"
 
-export async function createEvent(formData: FormData, userdata: any) {
+interface UserData {
+    name: string;
+    email: string;
+    image: string;
+    id: string;
+}
+
+export async function createEvent(formData: FormData, userdata: UserData) {
     try {
         await connectToDB();
 
@@ -44,7 +51,7 @@ export async function createEvent(formData: FormData, userdata: any) {
 
         let imageUrl = ""
 
-        const imageFile = formData.get("imageUrl")
+        const imageFile: File | null = formData.get("imageUrl") as File | null
         if (imageFile && imageFile instanceof File) {
 
             try {
@@ -126,7 +133,7 @@ export async function getAllEvent(limit = 9, query = "", category = "", page = 1
 
         const filter = { ...searchQuery, ...categoryFilter }
 
-        let events = await Event.find(filter)
+        const events = await Event.find(filter)
             .populate("organizer")
             .sort({ createdAt: "desc" })
             .skip((page - 1) * limit)

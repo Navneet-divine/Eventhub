@@ -2,7 +2,6 @@
 "use server";
 import User from "@/models/User";
 import { connectToDB } from "../db";
-import cloudinary from "../cloudinary";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 

@@ -1,5 +1,4 @@
 import React, { ReactNode } from "react";
-import { Instagram } from "lucide-react";
 
 interface SocialsProps {
   text: string;

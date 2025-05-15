@@ -92,11 +92,13 @@ const Testimonial: React.FC = () => {
               Fastest Eventhub Hosting!
             </h1>
             <p className="text-gray-600 font-inter">
-              I've been using eventhub for quite a while now. I went to a lot of
-              meetups because I love interacting with different people and I've
+              I&#39;ve been using eventhub for quite a while now. I went to a lot of
+              meetups because I love interacting with different people and I&#39;ve
               been thinking about hosting my own meetup. So I went to eventhub
               to host a meetup and I was SHOCKED! after seeing how easy it was
-              to host a meetup on this platform. Thanks{" "}
+              to host a meetup on this platform. Thanks
+              <span className="text-violet-500">@eventhub</span> for making this
+              platform.
               <span className="text-violet-500">@eventhub</span> for making this
               platform.
             </p>

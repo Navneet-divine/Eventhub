@@ -1,13 +1,13 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect} from "react";
 import { getUserEvents } from "@/lib/actions/user.actions";
 import MyEvents from "@/components/MyEvents";
 import BookedEvents from "@/components/BookedEvents";
 
 const MyEvent: React.FC = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchUserEvents = async () => {

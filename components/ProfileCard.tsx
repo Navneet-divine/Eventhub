@@ -28,25 +28,25 @@ const ProfileCard: React.FC<EventDataProps> = ({ allEvents }) => {
     <div className="flex flex-col gap-5 px-5 md:px-0">
       {allEvents?.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5">
-          {allEvents.map((event: any, i: number) => (
+          {allEvents.map((event, i: number) => (
             <Card
               key={i}
-              eventId={event._id}
+              eventId={event.id}
               title={event.title}
               description={event.description}
               imageUrl={event.imageUrl}
-              date={event.date}
+              date={new Date(event.startDateTime).toISOString()}
               location={event.location}
               price={event.price}
               category={event.category}
-              startDateTime={event.startDateTime}
-              organizer={event.organizer.name}
+              startDateTime={new Date(event.startDateTime).toISOString()}
+              organizer={event.organizer}
               showEditDelete={
-                session?.user.email === event.organizer.email ? true : false
+                session?.user.email === event.organizer ? true : false
               }
               onDelete={() => {
                 // Add your delete logic here
-                console.log(`Delete event with ID: ${event._id}`);
+                console.log(`Delete event with ID: ${event.id}`);
               }}
             />
           ))}
