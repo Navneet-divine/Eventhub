@@ -63,7 +63,7 @@ const SocialsForm: React.FC = () => {
     formData.append("linkedIn", form.linkedIn);
 
     startTransition(async () => {
-      const result = await updateSocials(session.user.email, formData);
+      const result = await updateSocials(session.user.email as string, formData);
       if (result.success) {
         window.location.reload();
       }
