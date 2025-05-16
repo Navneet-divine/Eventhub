@@ -1,6 +1,5 @@
 ![eventhub](https://github.com/user-attachments/assets/0e372de7-5da0-4acf-8270-2fe96a1395f4)
 
-📅 Event Hub
 Eventhub is a full-stack web application built with modern technologies where users can:
 
 •📝 Create, Read, Update, and Delete (CRUD) events
