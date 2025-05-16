@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+![eventhub](https://github.com/user-attachments/assets/0e372de7-5da0-4acf-8270-2fe96a1395f4)
 
-## Getting Started
+📅 Event Hub
+Eventhub is a full-stack web application built with modern technologies where users can:
 
-First, run the development server:
+•📝 Create, Read, Update, and Delete (CRUD) events
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+•🔍 Search through events using keywords
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+•🗂️ Filter events by category
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+•🎨 A clean and responsive UI for an easy user experience
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project showcases key full-stack development skills, including form handling, data validation, dynamic routing, and interaction with a database.
 
-## Learn More
+# 🔧 Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+• Next.js React framework for SSR & SSG
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+• Tailwind CSS Utility-first CSS framework
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+• Shadcn UI Component library for React
 
-## Deploy on Vercel
+•TypeScript Static typing for better DX
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+ # 🔗 Live Demo
+ 👉 https://eventhub-j1dh.onrender.com
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+ # 📬 Contact
+Feel free to connect with me on LinkedIn at https://www.linkedin.com/in/navneet-kush/
+
+
+
