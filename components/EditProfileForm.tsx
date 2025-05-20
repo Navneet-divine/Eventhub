@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
-import { editProfile} from "@/lib/actions/user.actions";
+import { editProfile } from "@/lib/actions/user.actions";
 import { useSession } from "next-auth/react";
 
 interface Props {
@@ -116,7 +116,7 @@ const EditProfileForm: React.FC<Props> = ({ onUpdate }) => {
         <Button
           type="submit"
           disabled={loading}
-          className={`${
+          className={`cursor-pointer ${
             loading ? "bg-violet-400" : "bg-violet-500 hover:bg-violet-600"
           }`}
         >
