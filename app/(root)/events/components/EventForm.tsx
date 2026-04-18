@@ -242,11 +242,14 @@ const EventForm: React.FC = () => {
                       )}
 
                       {imagePreview && (
-                        <img
-                          src={imagePreview || "/placeholder.svg"}
-                          alt="Preview"
-                          className="w-full h-full object-cover rounded-md"
-                        />
+                        <div className="relative w-full h-full">
+                          <Image
+                            src={imagePreview || "/placeholder.svg"}
+                            alt="Preview"
+                            fill
+                            className="object-cover rounded-md"
+                          />
+                        </div>
                       )}
 
                       <FormControl>

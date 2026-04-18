@@ -52,9 +52,30 @@ const EventDetails = () => {
     const status = searchParams.get("status");
 
     if (status === "success") {
-      setHasPurchased(true);
+      ;(async () => {
+        try {
+          if (session?.user?.email) {
+            await fetch("/api/purchase", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ eventId, email: session.user.email }),
+            })
+          }
+        } catch (error) {
+          console.error("Failed to persist purchase:", error)
+        }
+
+        setHasPurchased(true)
+
+        try {
+          const refreshed = await getEventById(eventId)
+          setEvent(refreshed)
+        } catch (err) {
+          console.error("Failed to refresh event after purchase:", err)
+        }
+      })()
     }
-  }, []);
+  }, [eventId, session?.user?.email]);
 
   useEffect(() => {
     if (!eventId) return;
@@ -219,14 +240,14 @@ const EventDetails = () => {
                   {event.price !== "" && (
                     <Button
                       onClick={handleCheckout}
-                      disabled={hasPurchased}
+                      disabled={hasPurchased || isBooked}
                       className={`w-30 rounded-full h-10 font-inter ${
-                        hasPurchased
+                        hasPurchased || isBooked
                           ? "bg-green-500 cursor-not-allowed"
                           : "bg-violet-600 hover:bg-violet-700 cursor-pointer"
                       }`}
                     >
-                      {hasPurchased ? "Purchased" : "Get Ticket"}
+                      {hasPurchased || isBooked ? "Purchased" : "Get Ticket"}
                     </Button>
                   )}
                 </div>

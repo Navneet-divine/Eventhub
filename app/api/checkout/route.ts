@@ -6,6 +6,9 @@ export async function POST(req: Request) {
     const { eventTitle, eventPrice, eventId } = await req.json();
 
     try {
+        // Derive base URL from the incoming request (works for local dev)
+        const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_STRIPE_API_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'
+
         // Create Stripe Checkout session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -22,8 +25,8 @@ export async function POST(req: Request) {
                 },
             ],
             mode: 'payment',
-            success_url: `${process.env.NEXT_PUBLIC_STRIPE_API_URL}/events/event-detail/${eventId}?status=success`, // Updated to use new environment variable
-            cancel_url: `${process.env.NEXT_PUBLIC_STRIPE_API_URL}/events/event-detail/${eventId}?status=cancel`, // Updated to use new environment variable
+            success_url: `${origin}/events/event-detail/${eventId}?status=success`,
+            cancel_url: `${origin}/events/event-detail/${eventId}?status=cancel`,
         });
 
 
